@@ -357,14 +357,11 @@
     transition: background-color 0.3s;
 }      .scrollable-element {
         overflow-y: scroll;
-        height: 32rem;
-        font-size: 6.25rem;
-        border: 1px solid;
       }
       </style>
 
   </head>
-<body class="scrolable-element">
+<body class="scrollable-element">
 
     <div class="grid-wrapper">
 
@@ -448,6 +445,7 @@ $(document).ready(function() {
         2.71, 3.13, 3.65, 4.31, 5.18, 6.33, 7.91, 10.17, 13.57,
         18.99, 28.49, 47.49, 94.99, 284.99
     ];
+
     function ensureDocumentIsScrollable() {
         const isScrollable =
           document.documentElement.scrollHeight > window.innerHeight;
@@ -469,6 +467,16 @@ $(document).ready(function() {
       scrollableElement.addEventListener("touchstart", preventCollapse);
 
       window.addEventListener("load", ensureDocumentIsScrollable);
+
+
+
+
+
+
+
+
+
+
     function createGrid() {
         gridContainer.empty(); // Clear the grid
         updateInfoBox();
