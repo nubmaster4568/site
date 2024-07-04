@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+    
+    /* Reset and base styles */
+      * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+      }
+      
+      body {
+          font-family: 'Roboto', sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          height: 100vh;
+          margin: 0;
+          background-color: rgb(10, 15, 29);
+          color: white;
+      }
+      
+      .grid-wrapper {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          width: 100%;
+          margin-bottom: 20px;
+      }
+      
+      .info-container {
+          display: flex;
+          justify-content: space-between;
+          width: 90%;
+          max-width: 600px;
+          margin-bottom: 20px;
+      }
+      
+      .info-box {
+          display: flex;
+          align-items: center;
+          background-color: rgb(25, 32, 51);
+          border-radius: 10px;
+          padding: 10px;
+          color: white;
+      }
+      
+      .info-icon {
+          font-size: 1.5rem;
+          margin-right: 5px;
+      }
+      
+      .grid-container {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 10px;
+          width: 90%;
+          max-width: 100%;
+          margin: auto;
+          padding: 20px;
+          background-color: rgb(25, 32, 51);
+          border-radius: 10px;
+          position: relative;
+          
+      }
+      
+      .grid-item {
+        box-shadow: rgb(14, 78, 109) 0px 4px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: linear-gradient(180deg, #1c89fe 100%, rgba(20, 26, 41, 0) 100%);
+          border-radius: 10px;
+          font-size: 1.5rem;
+          cursor: pointer;
+          transition: background-color 0.3s, transform 0.3s;
+          position: relative;
+          padding-top: 100%;
+      }
+      
+      .grid-item span {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          visibility: hidden;
+      }
+      
+      .grid-item.safe {
+          background-color: #4CAF50;
+          background-image: url('https://tonroll.com/static/media/rotatingDiamond.6b601b3dd1c845cb3ee7.gif');
+    background-size: cover; /* Adjust to fit the element */
+    background-repeat: no-repeat; 
+          
+      }
+      
+      .grid-item.mine {
+          background-color: #f44336;
+          animation: explode 0.5s forwards;
+      }
+      
+      .grid-item:hover {
+          transform: scale(1.05);
+      }
+      
+      .grid-item:active {
+          transform: scale(0.95);
+      }
+      
+      @keyframes explode {
+          0% {
+              transform: scale(1);
+              opacity: 1;
+          }
+          100% {
+              transform: scale(1.5);
+              opacity: 0;
+          }
+      }
+      
+      .button-container {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 20px;
+      }
+      
+      .start-button-container {
+          margin-bottom: 10px;
+          width: 90%;
+      }
+      
+      .start-button {
+          margin-top: 10px;
+          font-size: 1rem;
+          padding: 15px 20px;
+          cursor: pointer;
+          background:linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%);
+          color: white;
+          border: none;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+          width: 100%;
+      }
+      
+      .start-button:hover {
+          background-color: #0056b3;
+      }
+      
+
+      
+
+      
+
+      
+
+      
+      .popup-button {
+          font-size: 1rem;
+          padding: 10px 20px;
+          cursor: pointer;
+          background-color: #6c757d;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+      }
+      
+      .popup-button:hover {
+          background-color: #5a6268;
+      }
+      
+      .mines-menu {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    display: none; /* Initially hidden */
+}
+
+
+.mines-menu.active {
+    display: block;
+}
+
+      
+      .mines-menu label {
+          display: block;
+          margin-bottom: 5px;
+          font-size: 0.9rem;
+      }
+      
+      .mines-menu select {
+          padding: 8px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          font-size: 0.9rem;
+          width: 100%;
+      }
+
+      .multipliers-container {
+    padding: 10px;
+    background: linear-gradient(180deg, rgb(20, 26, 41) 0%, rgba(20, 26, 41, 0) 100%);
+    display: flex;
+    justify-content: flex-start; /* Align items to the left */
+    align-items: center;
+    margin-top: 10px;
+    width: 90%; /* Adjust width to leave space on both sides */
+    max-width: 600px; /* Set a maximum width if needed */
+    overflow-x: scroll; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical scrolling */
+    border-radius: 10px;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.multipliers-container::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+}
+
+.multipliers-inner {
+    display: flex;
+    justify-content: flex-start; /* Align items to the left */
+    align-items: center;
+    padding: 0; /* Remove padding to maintain alignment */
+}
+
+
+
+.multiplier-box {
+  
+    padding: 5px;
+    margin: 0 5px;
+    border: 2px solid rgb(25, 32, 51);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color:#ccc;
+    transition: transform 0.3s ease; /* Use transform for smooth scaling */
+}
+
+      
+      .multiplier-box.current {
+        border: 2px solid #28a745;
+
+          font-size: 1rem;
+          color: #28a745;
+
+      }
+
+      .css-gg4vpm {
+    display: flex;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+      }
+      .css-1ewlwsu {
+    width: 62.6%;
+}
+.css-ohxpp6 {
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 18px;
+}
+.css-14s4iyf {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    position: relative;
+}
+.css-14s4iyf {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    position: relative;
+}
+.css-15dxxqe {
+    color: #FFFFFF;
+    width: 100%;
+    min-width: 0px;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    position: relative;
+    appearance: none;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 200ms;
+    padding-inline-start: 1rem;
+    padding-inline-end: 1rem;
+    padding: 14px 126px 14px 42px;
+    height: 52px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+    border: 1px solid rgb(44, 55, 85);
+    border-radius: 8px;
+    background: #252E47;
+}
+.css-1czj2zp {
+    width: 24px;
+    height: 24px;
+    background: url(/static/media/demoCurrency.372a0f1….svg) center center / contain no-repeat;
+    position: absolute;
+    left: 16px;
+    z-index: 1;
+}
+.css-1oy4d2y {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    position: absolute;
+    right: 8px;
+    gap: 4px;
+    z-index: 1;
+}
+
+.css-lakxj1 {
+    border-color: #2c3755c1;
+    display: inline-flex;
+    appearance: none;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    user-select: none;
+    position: relative;
+    white-space: nowrap;
+    vertical-align: middle;
+    outline-offset: 2px;
+    border-radius: 8px;
+    color: #FFFFFF;
+    min-width: 2.5rem;
+    padding-inline: 20px;
+    width: 52px;
+    height: 36px;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 18px;
+    background: #2C3755;
+    border: none;
+    outline: none;
+    /* Adjust padding and other styles as needed */
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+      </style>
+
+  </head>
+<body>
+
+    <div class="grid-wrapper">
+
+        <div class="info-container">
+            <div class="info-box">
+                <div class="info-icon">💎</div>
+                <div id="safeCellsCount" class="info-value">24</div>
+            </div>
+            <div class="info-box">
+                <div class="info-icon">💣</div>
+                <div id="minesCount" class="info-value">1</div>
+            </div>
+        </div>
+        
+        <div class="grid-container">
+            <!-- Grid items will be dynamically generated -->
+
+
+        </div>
+
+        <div class="multipliers-container">
+          <div class="multipliers-inner">
+  
+          </div>
+  
+        </div>
+
+    </div>
+
+    <div class="button-container">
+
+      <div class="start-button-container">
+          <button class="start-button">Start Game</button>
+      </div>
+      <button class="popup-button" id="minesSelect">Mines</button>
+  </div>
+        <div class="css-gg4vpm">
+        <div class="css-1ewlwsu">
+            <div class="css-ohxpp6">Choose Amount</div>
+            <div class="css-14s4iyf">
+                <input type="text" id="betInput" class="chakra-input css-15dxxqe" value="1.28">
+                <div class="css-1czj2zp"></div>
+                <div class="css-1oy4d2y">
+                    <button type="button" class="css-lakxj1">x2</button>
+                    <button type="button" class="css-lakxj1">Split</button>
+                </div>
+            </div>
+        </div>
+  </div>
+  <div class="mines-menu" id="minesMenu">
+      <label for="minesSelect">Select number of mines:</label>
+      <select id="minesSelect">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+      </select>
+
+
+</div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+$(document).ready(function() {
+    const gridContainer = $('.grid-container');
+    const safeCellsCount = $('#safeCellsCount');
+    const minesCount = $('#minesCount');
+    const startButton = $('.start-button');
+    const betInput = $('#betInput'); // Assuming you have an input with ID betInput
+    const minesMenu = $('#minesMenu');
+    const multipliersContainer = $('.multipliers-container');
+
+    let isGameStarted = false;
+    let totalCells = 25; // Default totalCells value
+    let mineCount = 1; // Default number of mines
+    let mineIndices = [];
+    let currentMultiplierIndex = 0;
+    
+    const multipliers = [
+        1, 1.03, 1.12, 1.23, 1.35, 1.5, 1.66, 1.86, 2.09, 2.37,
+        2.71, 3.13, 3.65, 4.31, 5.18, 6.33, 7.91, 10.17, 13.57,
+        18.99, 28.49, 47.49, 94.99, 284.99
+    ];
+
+    function createGrid() {
+        gridContainer.empty(); // Clear the grid
+        updateInfoBox();
+        for (let i = 0; i < totalCells; i++) {
+            const cell = $('<div class="grid-item"><span></span></div>');
+            gridContainer.append(cell);
+        }
+        if (!isGameStarted) {
+            $('.grid-item').off('click'); // Remove any existing click listeners
+        }
+    }
+
+    function generateMineIndices() {
+        mineIndices = [];
+        while (mineIndices.length < mineCount) {
+            const newIndex = Math.floor(Math.random() * totalCells);
+            if (!mineIndices.includes(newIndex)) {
+                mineIndices.push(newIndex);
+            }
+        }
+    }
+
+    function placeMines() {
+        generateMineIndices();
+        $('.grid-item').each(function(index) {
+            if (mineIndices.includes(index)) {
+                $(this).data('isMine', true);
+                $(this).find('span').text('X').hide(); // Mark mine but hide it initially
+            } else {
+                $(this).data('isMine', false);
+            }
+        });
+    }
+
+    function handleCellClick(cell, index) {
+        if (!isGameStarted) return;
+
+        const isMine = cell.data('isMine');
+        if (isMine) {
+            cell.addClass('mine');
+            cell.find('span').css('visibility', 'visible');
+            setTimeout(() => {
+                alert('You hit a mine! Game restarts.');
+                startGame();
+                currentMultiplierIndex = 0; // Reset current multiplier index
+                updateMultiplierBoxes(); // Update multiplier boxes visually
+            }, 1000); // Adjust timing as needed
+        } else {
+            cell.addClass('safe');
+            cell.off('click'); // Remove click event for safe cell
+            currentMultiplierIndex++;
+            updateMultiplierBoxes();
+            checkWinCondition();
+        }
+    }
+
+    function checkWinCondition() {
+        const safeCellsOpened = $('.grid-item.safe').length;
+        if (safeCellsOpened === totalCells - mineCount) {
+            alert('Congratulations! You found all safe cells.');
+            startGame();
+        }
+    }
+
+    function updateInfoBox() {
+        safeCellsCount.text(totalCells - mineCount);
+        minesCount.text(mineCount);
+    }
+
+    function startGame() {
+        isGameStarted = true;
+        createGrid();
+        placeMines();
+        $('.grid-item').on('click', function() {
+            const index = $('.grid-item').index(this);
+            handleCellClick($(this), index);
+        });
+    }
+
+    function splitBet() {
+        let currentBet = parseFloat(betInput.val());
+        if (currentBet > 0.01) {
+            betInput.val((currentBet / 2).toFixed(2));
+        }
+    }
+
+    function doubleBet() {
+        let currentBet = parseFloat(betInput.val());
+        betInput.val((currentBet * 2).toFixed(2));
+    }
+
+    function toggleMinesMenu() {
+        // Toggle visibility of mines menu
+        minesMenu.toggleClass('active');
+
+        // Position the mines menu relative to the mine button
+        const buttonPosition = $('.popup-button').offset();
+        minesMenu.css({
+            bottom: $(window).height() - buttonPosition.top + 10,
+            right: $(window).width() - (buttonPosition.left + $('.popup-button').outerWidth())
+        });
+    }
+
+    function updateMineCount() {
+        mineCount = parseInt($('#minesSelect').val());
+        updateInfoBox();
+    }
+
+    function createMultiplierBoxes() {
+        multipliersContainer.empty();
+        multipliers.forEach((multiplier, index) => {
+            const box = $('<div class="multiplier-box"></div>');
+            if (index === currentMultiplierIndex) {
+                box.addClass('current');
+            }
+            box.text(multiplier.toFixed(2));
+            multipliersContainer.append(box);
+        });
+    }
+
+    function updateMultiplierBoxes() {
+        $('.multiplier-box').removeClass('current');
+        $('.multiplier-box').eq(currentMultiplierIndex).addClass('current');
+
+        // Get current multiplier box and its position
+        const currentBox = $('.multiplier-box.current');
+        const container = $('.multipliers-container');
+        const boxWidth = currentBox.outerWidth(); // Width of the current box
+        const scrollTo = currentBox.position().left + container.scrollLeft() - boxWidth / 1.5; // Adjusted scroll position
+
+        // Animate scroll to the adjusted position
+        container.animate({
+            scrollLeft: scrollTo
+        }, 600); // Adjust speed as needed
+    }
+
+    // Event Listeners
+    startButton.on('click', startGame);
+    $('#minesSelect').on('change', updateMineCount);
+
+    $('.button-container .button').on('click', function(event) {
+        const action = $(this).text().toLowerCase();
+        if (action === 'split') {
+            splitBet();
+        } else if (action === 'x2') {
+            doubleBet();
+        }
+    });
+
+    $('.popup-button').on('click', toggleMinesMenu);
+
+    // Prevent collapsing when scrolling on touch devices
+    $(document).on('touchmove', function(event) {
+        if (event.target.closest('.grid-container') || event.target.closest('.multipliers-container')) {
+            event.preventDefault();
+        }
+    });
+
+    // Initialize the game and multipliers
+    createGrid();
+    createMultiplierBoxes();
+});
+
+    </script>
+</body>
+</html>
