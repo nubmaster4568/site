@@ -5,327 +5,1172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
+
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin: 0;
+            background-color: rgb(10, 15, 29);
+            color: white;
+            overflow-x: hidden;
+
+        }
+        
+        .grid-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .info-container {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            display: flex;
+            align-items: center;
+            background-color: rgb(25, 32, 51);
+            border-radius: 10px;
+            padding: 10px;
+            color: white;
+        }
+        
+        .info-icon {
+            font-size: 1.5rem;
+            margin-right: 5px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 90%;
+            max-width: 100%;
+            margin: auto;
+            padding: 20px;
+            background-color: rgb(25, 32, 51);
+            border-radius: 10px;
+            position: relative;
+            
+        }
+        
+        .grid-item {
+          box-shadow: rgb(14, 78, 109) 0px 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, #1c89fe 100%, rgba(20, 26, 41, 0) 100%);
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            position: relative;
+            padding-top: 100%;
+        }
+        /* Reset default margin and padding */
+        #lottie1 {
+            width: 214px;
+            height: 214px;
+            position: absolute;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
     
-    /* Reset and base styles */
-      * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-      }
-      
-      body {
-          font-family: 'Roboto', sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          height: 100vh;
-          margin: 0;
-          background-color: rgb(10, 15, 29);
-          color: white;
-      }
-      
-      .grid-wrapper {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
+        .grid-item span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            visibility: hidden;
+        }
+
+        
+        
+        .grid-item.safe {
+            background-color: #4CAF50;
+            background-image: url('https://tonroll.com/static/media/rotatingDiamond.6b601b3dd1c845cb3ee7.gif');
+            background-size: 80% 80%; /* Adjust the size as per your preference */
+            background-repeat: no-repeat;
+            background-position: center center; /* Center the background image */
+    
+        }
+        
+        
+        .grid-item.mine {
+            background-color: #f44336;
+            background-image: url('download.png');
+            background-size: cover; /* Adjust to fit the element */
+            background-repeat: no-repeat;
+            background-size: 70% 70%; /* Adjust the size as per your preference */
+            background-repeat: no-repeat;
+            background-position: center center;
+            position: relative; /* Ensure the z-index works correctly */
+        }
+        
+        .grid-item.mine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAABYCAYAAABxlTA0AAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAABLwSURBVHgB7ZxbbFXHesdn2RgwBDAQCLeEnRsNuYAPyq1SInyiSjlBuYByo3kIRn2p+kKIVFVqHjBVH9I+NKd9qPqGeajUVqWhOpGOFEXJRkdJkKIIk4TcExuScA8xGAPG2Ot8v2H9fcbD2vYG1jZHOfsvLa/brLVm/vOfb775Zradq6OOOuqoo4466qijjj89JK6OUejes61l3sx57UlT80o3PNSWDp0tpcMDLnVJb5K6LufSvS4Z2jnj9r8sV/O+OsEBTn76n5sap83vcMPnWobOnzF+B4ygBiPXucamJhfR1TOUpptn/9nzO8d6Z51gh2pfa5k77abXGpqmtQ/2H3MDp0+6C+eHus719++6MJz2pI2NvQ2uoTRl+rSVzdOnt01untrSOGkSj/bOXPbc7LHePcnV4WY1ziknjc0rzxzvdgP9feXTx/u2Ln/2H8uV0n/5239unzF39oaps+bscnWMjWO7/+21vq9+kx5+91/Sz//v73/t6igOh975h/aTn/1venDXP6X7/udvX3c1QIP7maG9vb3FttJ46Q6901Fqmrloy/lTh13fieM95/sHN7oa4Gdlg19++eUtK1as6JgxY4Z76KGHXENDQ/nQoUPbX3nllc447eD5gU2TGyaVeg/3uDO9Z9b9YuO/97oa4GfjRaxdu7ZkpHbffvvt7rPPPnMHDhxwTeZaXX/99W7mzJk9s2fP3vriiy92krb7ty+VJje1dKdu2J04eLRzxYv/URP1gj9KBUOWjnfu3NlTzTNG5uunTp1ySZK4oaEh19jYiIId106fPl366aeftr366qtb7P7mZOjQUxeGTrqBs4Ouf+jcVldDXFOC169f32YkrBweHm61grfapVKapi3cs73fnn32WZedd9nWa2n32r5sl7pE/gsvvNBuu9bBwUH3448/etUeOXLEEwzRfX19btq0ac5ILlm614eGkt7GZMidOXW688//qrPH1RATSrAps6W5ubnNDjdY4dtEJiQACEGBNO1J5shzDFCkkdfK3ghus+NNtud9XbbvtHQvkf7YsWNuzpw57uabb3aTJ0/2z/b29rpdu3a5G2+8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'); /* Same image as background */
+            background-size: 70% 70%; /* Adjust the size as per your preference */
+            background-repeat: no-repeat;
+            background-position: center center;
+            z-index: 99999; /* Set a higher z-index for the pseudo-element */
+        }
+        
+        .grid-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .grid-item:active {
+            transform: scale(0.95);
+        }
+        
+    
+        
+        .button-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .start-button-container {
+            margin-bottom: 10px;
+            width: 90%;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .start-button {
+            margin-top: 10px;
+            font-size: 1rem;
+            padding: 15px 20px;
+            cursor: pointer;
+            background:linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        .start-button:hover {
+            background-color: #0056b3;
+        }
+        
+    
+        
+    
+        
+    
+        
+    
+        
+        .popup-button {
+            font-size: 1rem;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .popup-button:hover {
+            background-color: #5a6268;
+        }
+        
+        .mines-menu {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      right: 0;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      display: none; /* Initially hidden */
+    }
+    
+    
+    .mines-menu.active {
+      display: block;
+    }
+    
+        
+        .mines-menu label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .mines-menu select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+    
+        .multipliers-container {
+      padding: 10px;
+      background: linear-gradient(180deg, rgb(20, 26, 41) 0%, rgba(20, 26, 41, 0) 100%);
+      display: flex;
+      justify-content: flex-start; /* Align items to the left */
+      align-items: center;
+      margin-top: 10px;
+      width: 90%; /* Adjust width to leave space on both sides */
+      max-width: 600px; /* Set a maximum width if needed */
+      overflow-x: scroll; /* Enable horizontal scrolling */
+      overflow-y: hidden; /* Hide vertical scrolling */
+      border-radius: 10px;
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+    
+    .multipliers-container::-webkit-scrollbar {
+      display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+    }
+    
+    .multipliers-inner {
+      display: flex;
+      justify-content: flex-start; /* Align items to the left */
+      align-items: center;
+      padding: 0; /* Remove padding to maintain alignment */
+    }
+    
+    
+    
+    .multiplier-box {
+    
+      padding: 5px;
+      margin: 0 5px;
+      border: 2px solid rgb(25, 32, 51);
+      border-radius: 5px;
+      font-size: 0.9rem;
+      color:#ccc;
+      transition: transform 0.3s ease; /* Use transform for smooth scaling */
+    }
+    
+        
+        .multiplier-box.current {
+          border: 2px solid #28a745;
+            background:linear-gradient(180deg, rgb(25, 32, 51) 0%, rgba(20, 26, 41, 0) 100%);
+            font-size: 1rem;
+            color: #28a745;
+    
+        }
+        .css-dcaf8g {
+            display: flex;
+            -webkit-box-align: center;
+            align-items: center;
+            height: 36px;
+            padding-inline: 12px;
+            border-radius: 8px;
+            background: rgb(37, 46, 71);
+        }
+        .css-gg4vpm {
+      display: flex;
+      -webkit-box-pack: justify;
+      justify-content: space-between;
+      align-items: center;
+      flex-direction: unset;
+      width: 90%;
+      margin-bottom: 20px;
+      -webkit-box-pack: justify;
+      justify-content: space-between;
+        }
+        .css-1ewlwsu {
+      width: 62.6%;
+    }
+    .css-ohxpp6 {
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 18px;
+    }
+    .css-14s4iyf {
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      position: relative;
+    }
+    .css-14s4iyf {
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      position: relative;
+    }
+    .css-15dxxqe {
+      color: #FFFFFF;
+      width: 100%;
+      min-width: 0px;
+      outline: transparent solid 2px;
+      outline-offset: 2px;
+      position: relative;
+      appearance: none;
+      transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+      transition-duration: 200ms;
+      padding-inline-start: 1rem;
+      padding-inline-end: 1rem;
+      height: 52px;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 20px;
+      border: 1px solid rgb(44, 55, 85);
+      border-radius: 8px;
+      background: #252E47;
+    }
+    .css-1czj2zp {
+      width: 24px;
+      height: 24px;
+      background: url(/static/media/demoCurrency.372a0f1….svg) center center / contain no-repeat;
+      position: absolute;
+      left: 16px;
+    }
+    .css-gfevon {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        width: 40px;
+        background: rgb(37, 46, 71);
+        border: 1px solid rgb(44, 55, 85);
+        border-radius: 0px 8px 8px 0px;
+    }
+    .css-1i07r2i{
+        display: flex;
+        height: 52px;
+    }
+    .css-1oy4d2y {
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      position: absolute;
+      right: 8px;
+      gap: 4px;
+    }
+    .css-79elbk{
+    position: relative;
+
+    }
+    .css-lakxj1 {
+      border-color: #2c3755c1;
+      display: inline-flex;
+      appearance: none;
+      -webkit-box-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      justify-content: center;
+      user-select: none;
+      position: relative;
+      white-space: nowrap;
+      vertical-align: middle;
+      outline-offset: 2px;
+      border-radius: 8px;
+      color: #FFFFFF;
+      min-width: 2.5rem;
+      padding-inline: 20px;
+      width: 52px;
+      height: 36px;
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 18px;
+      background: #2C3755;
+      border: none;
+      outline: none;
+      /* Adjust padding and other styles as needed */
+      padding: 10px 20px;
+      cursor: pointer;
+      color: white;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    
+    .scrollable-element {
+          overflow-y: scroll;
           width: 100%;
-          margin-bottom: 20px;
-      }
-      
-      .info-container {
-          display: flex;
-          justify-content: space-between;
-          width: 90%;
-          max-width: 600px;
-          margin-bottom: 20px;
-      }
-      
-      .info-box {
-          display: flex;
-          align-items: center;
-          background-color: rgb(25, 32, 51);
-          border-radius: 10px;
-          padding: 10px;
-          color: white;
-      }
-      
-      .info-icon {
-          font-size: 1.5rem;
-          margin-right: 5px;
-      }
-      
-      .grid-container {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 10px;
-          width: 90%;
-          max-width: 100%;
-          margin: auto;
-          padding: 20px;
-          background-color: rgb(25, 32, 51);
-          border-radius: 10px;
-          position: relative;
-          
-      }
-      
-      .grid-item {
-        box-shadow: rgb(14, 78, 109) 0px 4px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: linear-gradient(180deg, #1c89fe 100%, rgba(20, 26, 41, 0) 100%);
-          border-radius: 10px;
-          font-size: 1.5rem;
-          cursor: pointer;
-          transition: background-color 0.3s, transform 0.3s;
-          position: relative;
-          padding-top: 100%;
-      }
-      
-      .grid-item span {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          visibility: hidden;
-      }
-      
-      .grid-item.safe {
-          background-color: #4CAF50;
-          background-image: url('https://tonroll.com/static/media/rotatingDiamond.6b601b3dd1c845cb3ee7.gif');
-    background-size: cover; /* Adjust to fit the element */
-    background-repeat: no-repeat; 
-          
-      }
-      
-      .grid-item.mine {
-          background-color: #f44336;
-          animation: explode 0.5s forwards;
-      }
-      
-      .grid-item:hover {
-          transform: scale(1.05);
-      }
-      
-      .grid-item:active {
-          transform: scale(0.95);
-      }
-      
-      @keyframes explode {
-          0% {
-              transform: scale(1);
-              opacity: 1;
-          }
-          100% {
-              transform: scale(1.5);
-              opacity: 0;
-          }
-      }
-      
-      .button-container {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 20px;
-      }
-      
-      .start-button-container {
-          margin-bottom: 10px;
-          width: 90%;
-      }
-      
-      .start-button {
-          margin-top: 10px;
-          font-size: 1rem;
-          padding: 15px 20px;
-          cursor: pointer;
-          background:linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%);
-          color: white;
-          border: none;
-          border-radius: 5px;
-          transition: background-color 0.3s;
-          width: 100%;
-      }
-      
-      .start-button:hover {
-          background-color: #0056b3;
-      }
-      
-
-      
-
-      
-
-      
-
-      
-      .popup-button {
-          font-size: 1rem;
-          padding: 10px 20px;
-          cursor: pointer;
-          background-color: #6c757d;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          transition: background-color 0.3s;
-      }
-      
-      .popup-button:hover {
-          background-color: #5a6268;
-      }
-      
-      .mines-menu {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    right: 0;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    display: none; /* Initially hidden */
-}
+    
+        }
 
 
-.mines-menu.active {
-    display: block;
-}
-
-      
-      .mines-menu label {
-          display: block;
-          margin-bottom: 5px;
-          font-size: 0.9rem;
-      }
-      
-      .mines-menu select {
-          padding: 8px;
-          border-radius: 5px;
-          border: 1px solid #ccc;
-          font-size: 0.9rem;
-          width: 100%;
-      }
-
-      .multipliers-container {
-    padding: 10px;
-    background: linear-gradient(180deg, rgb(20, 26, 41) 0%, rgba(20, 26, 41, 0) 100%);
+    
+#chooseamount-mines {
+    width: 100%;
     display: flex;
-    justify-content: flex-start; /* Align items to the left */
+    flex-direction: column;
     align-items: center;
-    margin-top: 10px;
-    width: 90%; /* Adjust width to leave space on both sides */
-    max-width: 600px; /* Set a maximum width if needed */
-    overflow-x: scroll; /* Enable horizontal scrolling */
-    overflow-y: hidden; /* Hide vertical scrolling */
-    border-radius: 10px;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    margin-bottom: 20px;
+    
 }
 
-.multipliers-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
-}
 
-.multipliers-inner {
+
+
+.start-button-container {
     display: flex;
-    justify-content: flex-start; /* Align items to the left */
+    gap: 10px;
+}
+
+
+
+.css-15288wb {
+    display: flex;
+    -webkit-box-align: center;
     align-items: center;
-    padding: 0; /* Remove padding to maintain alignment */
-}
-
-
-
-.multiplier-box {
-  
-    padding: 5px;
-    margin: 0 5px;
-    border: 2px solid rgb(25, 32, 51);
-    border-radius: 5px;
-    font-size: 0.9rem;
-    color:#ccc;
-    transition: transform 0.3s ease; /* Use transform for smooth scaling */
-}
-
-      
-      .multiplier-box.current {
-        border: 2px solid #28a745;
-
-          font-size: 1rem;
-          color: #28a745;
-
-      }
-
-      .css-gg4vpm {
-    display: flex;
-    -webkit-box-pack: justify;
-    justify-content: space-between;
-      }
-      .css-1ewlwsu {
-    width: 62.6%;
-}
-.css-ohxpp6 {
-    margin-bottom: 8px;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    padding-inline: 16px;
     font-weight: 600;
     font-size: 15px;
-    line-height: 18px;
-}
-.css-14s4iyf {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    position: relative;
-}
-.css-14s4iyf {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    position: relative;
-}
-.css-15dxxqe {
-    color: #FFFFFF;
-    width: 100%;
-    min-width: 0px;
-    outline: transparent solid 2px;
-    outline-offset: 2px;
-    position: relative;
-    appearance: none;
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-    transition-duration: 200ms;
-    padding-inline-start: 1rem;
-    padding-inline-end: 1rem;
-    padding: 14px 126px 14px 42px;
-    height: 52px;
-    font-weight: 500;
-    font-size: 16px;
     line-height: 20px;
+    color: var(--ton-colors-white);
+    background: rgb(37, 46, 71);
     border: 1px solid rgb(44, 55, 85);
-    border-radius: 8px;
-    background: #252E47;
+    border-radius: 8px 0px 0px 8px;
+    margin-right: 1px;}
+    .css-1hl6eao {
+        display: none;
+        width: 100%;
+        height: 382px;
+        padding: 3px;
+        background: rgb(25, 32, 51);
+        border: 1px solid rgb(44, 55, 85);
+        border-radius: 11px;
+        overflow-y: auto;
+        position: absolute;
+        left: 0px;
+        bottom: calc(100% + 4px);
+        z-index: 100;
+    }
+    .css-r4k430 {
+        color: #ccc;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        height: 36px;
+        padding-inline: 12px;
+        border-radius: 8px;
+        width: 100%;
+        background: rgb(25, 32, 51);
+        border: none;
+    }
+
+.selected{
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        height: 36px;
+        padding-inline: 12px;
+        border-radius: 8px;
+        width: 100%;
+        background: linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%);
+        border: none;
+    }
+
+
+.balance {
+    margin-top: 10px;
 }
-.css-1czj2zp {
-    width: 24px;
-    height: 24px;
-    background: url(/static/media/demoCurrency.372a0f1….svg) center center / contain no-repeat;
-    position: absolute;
-    left: 16px;
-    z-index: 1;
+/* Hide dropdown content by default */
+.dropdown-btn {
+    background: transparent;
+    border: none; /* Remove default border if any */
+    box-shadow: none; /* Remove default box shadow */
+    outline: none; /* Remove default outline */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    padding: 0;
+     /* Optionally adjust padding as needed */
 }
-.css-1oy4d2y {
+.dropdown-btn-nav {
+        height: 40px;
+    width: 100%;
+    background-color: rgba(30, 38, 59, 0.6);
+    border-radius: 100px;
+    text-overflow: ellipsis;
     display: flex;
-    -webkit-box-align: center;
     align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    background: transparent;
+    border: none; /* Remove default border if any */
+    box-shadow: none; /* Remove default box shadow */
+    outline: none; /* Remove default outline */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    padding: 0;
+     /* Optionally adjust padding as needed */
+}
+.css-ee1ka2 {
+    border-radius: 24px;
+    background: rgb(25, 32, 51);
+    overflow: auto;
+}
+.css-79elbk {
+    position: relative;
+}
+.css-1ai6u4s {
+    padding: 16px 16px 18px;
+    position: relative;
+}
+.css-lakxj1 {
+    margin: 0 5px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+}
+.css-cjeilk {
+    width: 100%;
+    height: calc(100% - 68px);
+    background: radial-gradient(92.04% 100% at 50% 100%, rgba(22, 177, 255, 0.4) 0%, rgba(22, 177, 255, 0) 100%);
     position: absolute;
-    right: 8px;
-    gap: 4px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 100;
+    margin-top: 120px;
+    border-radius: 10px;
+}
+.css-oig4i9 {
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 40px;
+    margin-top: 90px;
+    position: relative;
     z-index: 1;
+}
+.css-w4ji5f {
+    color: rgb(255, 255, 255);
 }
 
-.css-lakxj1 {
-    border-color: #2c3755c1;
+.css-1bxvmsj {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    padding-inline: 16px;
+    width: 100%;
+    height: 56px;
+    position: fixed;
+    top: 0px;
+    background: rgb(10, 15, 29);
+    border-radius: 0px 0px 24px 24px;
+    z-index: 900;
+}
+.css-y7bmaj {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    cursor: pointer;
+    text-decoration: none;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+    margin-right: 16px;
+}
+.css-trfmtx {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+}
+.css-336v9b {
+    background: linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%) text;
+    color: transparent;
+    position: absolute;
+    transform: translate(2px, -2px);
+    z-index: -1;
+}
+.css-x3wokz {
+    width: 32px;
+    height: 32px;
+}
+.css-1blsr9 {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    gap: 8px;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    position: relative;
+    z-index: 999999;
+}
+.css-7wbbug {
+    display: flex;
+    gap: 8px;
+    flex: 1 1 0%;
+}
+.css-1bqnmih {
+    flex: 1 1 0%;
+    position: relative;
+}
+.css-143kgav {
+    display: inline-flex;
+    appearance: none;
+    -webkit-box-align: center;
+    align-items: center;
+    user-select: none;
+    position: relative;
+    vertical-align: middle;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--ton-colors-white);
+    min-width: unset;
+    font-size: 15px;
+    padding-inline: 20px;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    white-space: unset;
+    padding: 8px;
+    width: 100%;
+    height: 100%;
+    background: rgba(49, 61, 94, 0.32);
+    border-radius: 100px;
+    transition: all 0.2s ease 0s;
+}
+.css-2spfku {
+    width: 24px;
+    height: 24px;
+    background: url(dramCurrency.e1dc9c73d80f127650dfa39cc95570b2.svg) center center / contain no-repeat;
+    flex-shrink: 0;
+    margin-right:5px
+    
+}
+.css-1n0mcm2 {
+    position: absolute;
+    top: -12px;
+    left: 0px;
+}
+.css-rvql5x {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    position: relative;
+}
+
+.css-rqgsqp {
+    position: relative;
+    z-index: 1;
+}
+.css-1eff3hl {
+    width: 20px;
+    height: 20px;
+    background: url(/static/media/tonCurrency.e1dc9c7….svg) center center / contain no-repeat;
+    flex-shrink: 0;
+}
+.css-1g24mwa {
+    transition: all 0.2s ease 0s;
+}
+
+.css-jtrrfh {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--chakra-line-clamp);
+    --chakra-line-clamp: 1;
+}
+.css-1ane4l8 {
+    display: inline-flex;
+    appearance: none;
+    -webkit-box-align: center;
+    align-items: center;
+    user-select: none;
+    position: relative;
+    vertical-align: middle;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    line-height: 20px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: unset;
+    height: unset;
+    min-width: unset;
+    font-size: 15px;
+    padding-inline: 20px;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    white-space: unset;
+    width: 100%;
+    padding: 8px;
+    transition: all 0.2s ease 0s;
+    border-radius: 20px;
+    text-align: left;
+    z-index: 1;
+}
+.mobile {
+    max-width: 480px;
+    border: 1px #007aff;
+}
+
+.css-qra6ta {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+.css-16fsr7b {
+    flex: 1 1 0%;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--chakra-line-clamp);
+    --chakra-line-clamp: 1;
+}
+.css-1vmqozk {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-radius: 20px;
+    background: #192033;
+    padding: 8px;
+    box-shadow: rgba(10, 15, 29, 0.32) 0px 16px 44px 0px;
+}
+        .claim-button {
+            background-color: #4CAF50; /* Green background */
+            border: none;
+            color: white;
+            padding: 15px 20px;;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+        }
+        
+        .claim-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        
+        .claim-button:active {
+            background-color: #3e8e41; /* Darker green when pressed */
+        }
+        
+
+        .navigation-bar {
+            width: 90%;
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            margin: 0 auto;
+            margin-bottom: 20px;
+            margin-top: 10px; /* Center the .navigation-bar horizontally */
+            /* Center the .navigation-bar horizontally */
+        }
+        
+        .balance-navigation {
+            height: 40px;
+            width: 100%;
+            background-color:rgba(30, 38, 59, 0.6);;
+            border-radius: 100px;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Align items to the right */
+
+            padding-right: 10px; /* Center content inside the balance-navigation */
+        }
+        
+        .css-64qf3w {
+            display: none; /* Hidden by default */
+            /* Additional styles for flexbox layout */
+            margin: 0 auto;
+            width: 100%;
+            position: absolute;
+            left: 0px;
+            top: 45px;
+            z-index: 1000;
+            justify-content: center;
+        }
+        
+        .css-1vmqozk {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            border-radius: 20px;
+            background: #192033;
+            padding: 8px;
+            box-shadow: rgba(10, 15, 29, 0.32) 0px 16px 44px 0px;
+        }
+        .css-1ane4l8 {
+            display: inline-flex;
+            appearance: none;
+            -webkit-box-align: center;
+            align-items: center;
+            user-select: none;
+            position: relative;
+            vertical-align: middle;
+            outline: transparent solid 2px;
+            outline-offset: 2px;
+            line-height: 20px;
+            font-weight: 600;
+            color: white;
+            background: unset;
+            height: unset;
+            min-width: unset;
+            font-size: 15px;
+            padding-inline: 20px;
+            -webkit-box-pack: start;
+            justify-content: flex-start;
+            white-space: unset;
+            width: 100%;
+            padding: 8px;
+            transition: all 0.2s ease 0s;
+            border-radius: 20px;
+            text-align: left;
+            z-index: 1;
+        }
+
+        .css-qra6ta {
+            width: 24px;
+            height: 24px;
+            background: url(/static/media/tonCurrency.e1dc9c7….svg) center center / contain no-repeat;
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+        .css-16fsr7b {
+            flex: 1 1 0%;
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            --chakra-line-clamp: 1;
+        }
+        .css-lp8m3p {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            line-height: 1em;
+            flex-shrink: 0;
+            color: currentcolor;
+            vertical-align: middle;
+            fill: none;
+            visibility: visible;
+        }
+        .css-hyxlzm {
+            position: relative;
+            display: flex;
+        }
+        .css-1lppsyv {
+            display: inline-flex;
+            appearance: none;
+            -webkit-box-align: center;
+            align-items: center;
+            user-select: none;
+            position: relative;
+            vertical-align: middle;
+            outline: transparent solid 2px;
+            outline-offset: 2px;
+            line-height: 20px;
+            font-weight: 600;
+            color: white;
+            background: unset;
+            height: unset;
+            min-width: unset;
+            font-size: 15px;
+            padding-inline: 20px;
+            -webkit-box-pack: start;
+            justify-content: flex-start;
+            white-space: unset;
+            width: 100%;
+            padding: 8px;
+            transition: all 0.2s ease 0s;
+            border-radius: 20px;
+            z-index: 1;
+        }
+        .css-1etw0jx {
+            width: 24px;
+            height: 24px;
+            background: url(/static/media/demoCurrency.372a0f1….svg) center center / contain no-repeat;
+            flex-shrink: 0;
+            margin-right: 6px;
+        }
+        .css-1q6kicp {
+            font-weight: 500;
+            font-size: 15px;
+            line-height: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: var(--chakra-line-clamp);
+            --chakra-line-clamp: 1;
+        }
+
+        .css-y7bmaj {
+            transition-property: var(--ton-transition-property-common);
+            transition-duration: var(--ton-transition-duration-fast);
+            transition-timing-function: var(--ton-transition-easing-ease-out);
+            cursor: pointer;
+            text-decoration: none;
+            outline: transparent solid 2px;
+            outline-offset: 2px;
+            color: inherit;
+            -webkit-tap-highlight-color: transparent;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+        .css-trfmtx {
+            display: flex;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+        }
+        .css-x3wokz {
+            width: 32px;
+            height: 32px;
+        }
+.chakra-button {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+.balance-type {
+    background: linear-gradient(to right, rgb(10, 15, 29, 0.517), #192033);
+    
+    }
+
+
+    .css-f5z0tq {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgb(0, 122, 255);
+        position: relative;
+        border-radius: 100px;
+        z-index: 1;
+    }
+
+    .css-9jmbsi {
+        width: 100%;
+        height: calc(100% - 35%);
+        background: radial-gradient(92.04% 100% at 50% 100%, rgba(22, 177, 255, 0.4) 0%, rgba(22, 177, 255, 0) 100%);
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        z-index: 100;
+        margin-top: 120px;
+        border-radius: 10px;
+    }
+    .css-12c555f {
+        display: flex;
+
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 32px;
+        position: relative;
+        z-index: 1;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        padding: 20px 32px;
+        position: relative;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgb(52, 238, 80) 0%, rgb(36, 138, 61) 100%);
+        overflow: hidden;
+        flex-direction: column;
+        width: 200px;
+        margin: 0 auto;
+    }
+    .css-1g3zqnp {
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 40px;
+    }
+    .css-70qvj9 {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+    }
+
+    .css-1yd8k15 {
+        font-size: 20px;
+        font-weight: 200;
+    }
+
+
+
+/* FOOTER */
+
+.css-11a9jfv {
+    padding: 16px;
+    overflow: hidden;
+}
+.css-mxpbe {
+    padding-left: 20px;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 40px;
+}
+.css-1b2imgm {
+    width: 36px;
+    height: 36px;
+    background: url(https://tonroll.com/static/media/coinFunMobileLogo.f3adbc944ce1cba7a5d7737542f75a77.svg) center center / contain no-repeat;
+    margin: 6px;
+    flex-shrink: 0;
+}
+.css-iryp3t {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+}
+.css-afu3hu {
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 24px;
+    margin-bottom: 40px;
+    max-width: 90%;
+}
+.css-12nexpn {
+    position: relative;
+    color: #0088CC;
+}
+.css-12nexpn::before {
+    content: "";
+    width: 176.5px;
+    height: 28px;
+    position: absolute;
+    left: 0px;
+    top: -4px;
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgyIiBoZWlnaHQ9IjI5IiB2aWV3Qm94PSIwIDAgMTgyIDI5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBvcGFjaXR5PSIwLjIiIGQ9Ik0zIDIxLjQ4NDZDOS4yNDM0NiAxNS44ODMyIDIxLjY2MzUgNS42ODg2MyAyMS4zOTU5IDkuNzIxNjRDMjEuMDYxNCAxNC43NjI5IDEyLjY5OTcgMjUuNTE3NiAyMS4zOTU5IDIxLjQ4NDZDMzAuMDkyMSAxNy40NTE2IDQxLjQ2NDIgNy4zNjkwMyA0NC44MDg5IDkuNzIxNjRDNDguMTUzNiAxMi4wNzQyIDM0LjQ0MDMgMjUuMTgxNSA0Mi40Njc2IDIzLjgzNzJDNTAuNDk0OSAyMi40OTI5IDY3LjIxODQgNy43MDUxNiA3Ni4yNDkxIDguMDQxMjRDODUuMjc5OSA4LjM3NzMyIDY0LjU0MjcgMjcuODcwMiA3MS45MDEgMjUuODUzN0M3OS4yNTk0IDIzLjgzNzIgOTUuNjQ4NSAzIDEwNC4wMSAzQzExMi4zNzIgMyA5MS4zMDAzIDI3Ljg3MDIgOTkuMzI3NiAyNS44NTM3QzEwNy4zNTUgMjMuODM3MiAxMzYuNDU0IDAuMzExMjg1IDEzOS43OTkgOC4wNDEyNEMxNDMuMTQzIDE1Ljc3MTIgMTMyLjc3NSAyNS44NTM2IDE0NC4xNDcgMjEuNDg0NkMxNTUuNTE5IDE3LjExNTUgMTczLjI0NiAtMS4zNjkwOSAxNzIuMjQyIDUuMDE2NUMxNzEuMjM5IDExLjQwMjEgMTcxLjgwNyAyNy44NjkxIDE3OS41IDIzLjUiIHN0cm9rZT0idXJsKCNwYWludDBfbGluZWFyXzc4MTRfMTI1OTQpIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzc4MTRfMTI1OTQiIHgxPSIzIiB5MT0iMyIgeDI9IjguODk0MjQiIHkyPSI0OC4yMzE5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiMxNkIxRkYiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzg3MEUzIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==) 0% 0% / contain no-repeat;
+}
+.css-11d667b {
+    display: flex;
+    gap: 48px;
+    margin-bottom: 32px;
+}
+.css-1po5hec {
+    width: 152px;
+}
+
+.css-1mspllg {
+    margin-left:20px;
+    cursor: pointer;
+    text-decoration: none;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+.css-1aefsj6 {
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+    color: #A0AEC0;
+}
+
+
+.css-48xrei {
+    padding-right: 20px;
+    padding-left: 20px;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 20px;
+    padding-top: unset;
+    padding-bottom: unset;
+    margin-bottom: 8px;
+}
+
+.css-yhpud4 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.css-3hy8ay {
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 18px;
+}
+.css-18bu8jq {
+    animation: 0.4s ease 0s 1 normal none running animation-5j8bii;
+    margin-bottom: 4px;
+}
+.css-1e8fuvz {
+    animation: 0.4s ease 0s 1 normal none running animation-5j8bii;
+    margin-bottom: 12px;
+}
+.css-1r5mval {
+    margin-bottom: 12px;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 18px;
+    color: #A0AEC0;
+}
+.css-ahyunb {
+    animation: 0.4s ease 0s 1 normal none running animation-5j8bii;
+}
+.css-ucwhuv {
     display: inline-flex;
     appearance: none;
     -webkit-box-align: center;
@@ -336,34 +1181,96 @@
     position: relative;
     white-space: nowrap;
     vertical-align: middle;
+    outline: transparent solid 2px;
     outline-offset: 2px;
+    line-height: 20px;
     border-radius: 8px;
-    color: #FFFFFF;
-    min-width: 2.5rem;
-    padding-inline: 20px;
-    width: 52px;
-    height: 36px;
     font-weight: 600;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform; ;
+    transition-duration: 200ms;
+    height: 44px;
+    min-width: 2.5rem;
+    font-size: 15px;
+    padding-inline: 20px;
+    border-width: 1px;
+    border-style: solid;
+    border-image: initial;
+    color: #A0AEC0;
+    border-color: #2C3755;
+    background: unset;
+}
+.css-70qvj9 {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+}
+.css-1mft7ji {
+    margin-top: 5px;
+    margin-right: 12px;
+}
+.css-rj9zqz {
+    width: 100%;
+    font-weight: 500;
     font-size: 13px;
     line-height: 18px;
-    background: #2C3755;
-    border: none;
-    outline: none;
-    /* Adjust padding and other styles as needed */
-    padding: 10px 20px;
-    cursor: pointer;
-    color: white;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}      .scrollable-element {
-        overflow-y: scroll;
-      }
-      </style>
-
-  </head>
+    color: rgba(255, 255, 255, 0.44);
+}
+.css-scors8 {
+    display: flex;
+    padding: 12px 16px;
+    background: rgb(20, 26, 41);
+    width: 100%;
+    justify-content: center;
+}
+.css-1kah3yv {
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 18px;
+    background: linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%) text;
+    color: transparent;
+}</style>
+</head>
 <body>
 <div class="scrollable-element">
-    <div class="grid-wrapper">
+    <div class="navigation-bar">
+        <a class="chakra-link css-y7bmaj"><div class="css-trfmtx"><img src="https://tonroll.com/static/media/coinFunMobileLogo.f3adbc944ce1cba7a5d7737542f75a77.svg" class="chakra-image css-x3wokz"></div></a>
+
+        <div class="balance-navigation">
+            <button class="dropdown-btn-nav" id="dropdown-btn-nav" style="align-items: center;">
+                <svg id="arrow-svg-nav" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 9L12 15L18 9" stroke="url(#paint0_linear_6304_8524)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <defs>
+                        <linearGradient id="paint0_linear_6304_8524" x1="6" y1="9" x2="10.8" y2="18.6" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#33BBFF"></stop>
+                            <stop offset="1" stop-color="#0088CC"></stop>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </button>
+
+        </div>
+        <a class="chakra-link css-1mspllg" href="/wallet/deposit"><div class="css-f5z0tq"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 14H16.51M3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V9C21 7.89543 20.1046 7 19 7L5 7C3.89543 7 3 6.10457 3 5ZM3 5C3 3.89543 3.89543 3 5 3H17M17 14C17 14.2761 16.7761 14.5 16.5 14.5C16.2239 14.5 16 14.2761 16 14C16 13.7239 16.2239 13.5 16.5 13.5C16.7761 13.5 17 13.7239 17 14Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></a>
+
+    </div>
+    <div class="css-64qf3w" style="opacity: 1; transform: none;">
+        <div class="css-1vmqozk">
+            <button type="button" class="chakra-button css-1ane4l8">
+                <div class="css-2spfku"></div>
+                <div class="css-16fsr7b">0</div>
+                <div class="css-qra6ta"></div>
+
+
+            </button>
+            <div class="css-hyxlzm">
+                <button type="button" class="chakra-button css-1lppsyv">
+                    <div class="css-1q6kicp">2000</div>
+                    <div class="css-1etw0jx"></div>
+
+                </button>
+            </div>
+        </div>
+    </div>
+        <div class="grid-wrapper">
 
         <div class="info-container">
             <div class="info-box">
@@ -375,310 +1282,1128 @@
                 <div id="minesCount" class="info-value">1</div>
             </div>
         </div>
-        
+
         <div class="grid-container">
+
             <!-- Grid items will be dynamically generated -->
-
-
         </div>
-        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
 
 
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
 
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>
         <div class="multipliers-container">
           <div class="multipliers-inner">
-  
           </div>
-  
         </div>
 
     </div>
 
     <div class="button-container">
+        <div class="start-button-container">
+            <button class="start-button">Խաղալ</button>
+            <button class="claim-button" style="display: none;">Վերցնել շահույթը</button>
+        </div>
+        
+    </div>
 
-      <div class="start-button-container">
-          <button class="start-button">Start Game</button>
-      </div>
-      <button class="popup-button" id="minesSelect">Mines</button>
-  </div>
+    <div class="chooseamount-mines" id="chooseamount-mines">
         <div class="css-gg4vpm">
-        <div class="css-1ewlwsu">
-            <div class="css-ohxpp6">Choose Amount</div>
-            <div class="css-14s4iyf">
-                <input type="text" id="betInput" class="chakra-input css-15dxxqe" value="1.28">
-                <div class="css-1czj2zp"></div>
-                <div class="css-1oy4d2y">
-                    <button type="button" class="css-lakxj1">x2</button>
-                    <button type="button" class="css-lakxj1">Split</button>
+            <div class="css-1ewlwsu">
+                <div class="css-ohxpp6">Choose Amount</div>
+                <div class="css-14s4iyf" id="amount-block">
+                    <input type="text" id="betInput" class="chakra-input css-15dxxqe" value="1.28">
+                    <div class="css-1oy4d2y">
+                        <button type="button" class="css-lakxj1">x2</button>
+                        <button type="button" class="css-lakxj1">Split</button>
+                    </div>
                 </div>
             </div>
+
+            <div class="css-79elbk" id="mine-block">
+                <p class="chakra-text css-ohxpp6">Mines</p>
+            
+                <div class="css-1i07r2i">
+                    <div class="css-15288wb" id="mine-count">24</div>
+                    <div class="css-gfevon">
+                        <div class="css-1pd8ihc dropdown">
+                            <button class="dropdown-btn" id="dropdown-btn">
+                                <svg id="arrow-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 9L12 15L18 9" stroke="url(#paint0_linear_6304_8524)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <defs>
+                                        <linearGradient id="paint0_linear_6304_8524" x1="6" y1="9" x2="10.8" y2="18.6" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#33BBFF"></stop>
+                                            <stop offset="1" stop-color="#0088CC"></stop>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </button>
+                            <div minescountselectorref="[object Object]" class="css-1hl6eao" style="transform: none;">
+                                <button class="css-r4k430"><div class="css-1a5v845">1</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">2</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">3</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">4</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">5</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">6</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">7</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">8</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">9</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">10</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">11</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">12</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">13</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">14</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">15</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">16</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">17</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">18</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">19</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">20</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">21</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">22</div></button>
+                                <button class="css-r4k430"><div class="css-1a5v845">23</div></button>
+                                <button class="css-r4k430"><div class="css-ko6f3b">24</div></button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            </div>
         </div>
-  </div>
-  <div class="mines-menu" id="minesMenu">
-      <label for="minesSelect">Select number of mines:</label>
-      <select id="minesSelect">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-      </select>
+    </div>
+    <div class="css-0">
+        <div class="css-11a9jfv">
+            <div class="css-mxpbe">
+                <div class="css-1b2imgm"></div>
+                <div class="css-iryp3t">CryptoBet</div>
+            </div>
+            <p class="chakra-text css-afu3hu">
+                <span class="chakra-text css-12nexpn">Web3 Խաղերի հարթակ</span> blockchain-ի հիման վրա, բազմապատկիր հաշիվտ ստուգված արդարությամբ, արագ վճարումներով և 24/7 աջակցությամբ խաղերում:
+            </p>
+            <div class="css-11d667b">
+                <div class="css-1po5hec">
+                    <div class="css-48xrei">Խաղեր</div>
+                    <a class="chakra-link css-1mspllg" href="/double">
+                        <div class="css-1aefsj6">Ռուլետկա</div>
+                    </a>
+                    <a aria-current="page" class="chakra-link css-1mspllg active" href="/mines">
+                        <div class="css-1aefsj6">Ռումբ</div>
+                    </a>
+                </div>
+                <div class="css-0">
+                    <div class="css-48xrei">Ավելին</div>
+                    <a class="chakra-link css-1mspllg" href="/faq">
+                        <div class="css-1aefsj6">ՀՏՀ</div>
+                    </a>
+                    <a class="chakra-link css-1mspllg" href="/terms">
+                        <div class="css-1aefsj6">Ծառայությունների մատուցման պայմաններ</div>
+                    </a>
+                </div>
+            </div>
+            <div class="css-yhpud4">
+                <div class="css-0">
+                    <p class="chakra-text css-3hy8ay">Official wallet</p>
+                    <div class="chakra-skeleton css-xdfb4s">
+                        <p class="chakra-text css-10kwzia">50 746.32 TON</p>
+                    </div>
+                    <div class="chakra-skeleton css-1l9iv39">
+                        <p class="chakra-text css-1r5mval">$380 240.29</p>
+                    </div>
+                    <div class="chakra-skeleton css-cdkrf0">
+                        <button type="button" class="chakra-button css-ucwhuv">Open a Wallet</button>
+                    </div>
+                </div>
 
-
-</div>
+            </div>
+            <div class="css-70qvj9">
+                <div class="css-1mft7ji">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_6528_12480)">
+                            <path d="M9.82934 8.67676H7.62596C6.77899 8.67676 6.34277 8.82344 6.34277 9.52499V10.3254C6.34277 11.0301 6.77899 11.1736 7.62596 11.1736H8.13541C8.45063 11.1736 8.59392 11.3426 8.59392 11.8273V22.2995C8.59392 23.1477 8.74039 23.5846 9.44088 23.5846H10.2624C10.9661 23.5846 11.1093 23.1477 11.1093 22.2995V9.52818C11.1093 8.82663 10.6731 8.67995 9.82616 8.67995L9.82934 8.67676Z" fill="white" fill-opacity="0.44"></path>
+                            <path d="M24.9313 1.40628C23.9889 0.484703 22.8012 0 21.3747 0H10.6253C9.19562 0 7.98567 0.484703 7.06866 1.40628L1.37871 7.07922C0.48398 7.97529 0 9.16153 0 10.4721V21.4035C0 22.9054 0.509453 24.0694 1.52517 25.0643L6.92219 30.4694C7.98567 31.5344 9.17333 32.0223 10.6985 31.9968H21.3015C22.7789 31.9968 23.9889 31.5599 25.0778 30.4694L30.4748 25.0643C31.4683 24.0694 32 22.8831 32 21.4035V10.4721C32 9.16153 31.516 7.97529 30.6213 7.07922L24.9313 1.40628ZM29.8921 14.2063C29.8921 14.5698 29.7234 14.7643 29.3827 14.7643H27.762V13.6259C27.762 12.7777 27.641 12.3408 26.915 12.3408H26.1891C25.4631 12.3408 25.3421 12.7777 25.3421 13.6259V14.7643H24.2054C23.3584 14.7643 22.9222 14.8855 22.9222 15.6126V16.3874C22.9222 17.1145 23.3584 17.2357 24.2054 17.2357H25.3421V18.3741C25.3421 19.2223 25.4631 19.6592 26.1891 19.6592H26.915C27.641 19.6592 27.762 19.2223 27.762 18.3741V17.2357H29.3827C29.6979 17.2357 29.8667 17.4047 29.8921 17.7204V21.4035C29.8921 22.2996 29.6247 22.9788 28.9974 23.5847L23.6004 28.9897C22.9699 29.6211 22.2695 29.9113 21.397 29.9113H10.5998C9.72736 29.9113 9.02687 29.6211 8.39642 28.9897L2.9994 23.5847C2.36896 22.9533 2.0792 22.2996 2.10468 21.4035V10.7145C2.10468 9.81843 2.39443 9.04036 3.05035 8.38665L8.54289 2.81256C9.1001 2.25451 9.8006 2.0855 10.5998 2.0855H21.397C22.1962 2.0855 22.8967 2.25451 23.4539 2.81256L28.9496 8.38665C29.5801 9.04036 29.8921 9.81843 29.8921 10.7145V14.2063Z" fill="white" fill-opacity="0.44"></path>
+                            <path d="M20.3563 15.8551C21.7127 14.8602 21.735 13.8429 21.735 13.0202V12.1975C21.5885 9.45828 20.6715 8.41553 17.5002 8.41553C14.3288 8.41553 13.4086 9.45828 13.2653 12.1975V13.0202C13.2653 13.8429 13.2908 14.8634 14.644 15.8551C13.0233 16.4865 12.9023 17.8672 12.9023 19.6849C12.9023 22.3763 13.8448 23.7092 17.5002 23.7825C21.1555 23.7092 22.098 22.3763 22.098 19.6849C22.098 17.8672 21.977 16.4865 20.3563 15.8551ZM17.5002 10.6445C18.8311 10.6445 19.3628 11.1292 19.3628 12.7523C19.3628 14.3755 18.8311 14.8602 17.5002 14.8602C16.1692 14.8602 15.6375 14.3276 15.6375 12.7523C15.6375 11.1771 16.1692 10.6445 17.5002 10.6445ZM17.5002 21.4802C15.9527 21.4802 15.3955 20.8743 15.3955 19.3469C15.3955 17.8194 15.9527 17.1179 17.5002 17.1179C19.0476 17.1179 19.6048 17.8194 19.6048 19.3469C19.6048 20.8743 19.0476 21.4802 17.5002 21.4802Z" fill="white" fill-opacity="0.44"></path>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_6528_12480">
+                                <rect width="32" height="32" fill="white"></rect>
+                            </clipPath>
+                        </defs>
+                    </svg>
+                </div>
+                <p class="chakra-text css-rj9zqz">Հիշեք, որ դուք զբաղվում եք թվային ակտիվներով: Մի խաղադրույք կատարեք ավելին, քան դուք պատրաստ եք ծախսել լավ ժամանակի վրա: Մենք պարտավորվում ենք ապահովել ձեր հարմարավետությունն ու հաճույքը խաղի մեջ
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="css-scors8"><p class="chakra-text css-1kah3yv">Copyright © 2024 CryptoBet Armenia. All rights reserved.</p></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.8/lottie.min.js"></script>
     <script>
-$(document).ready(function() {
-    const gridContainer = $('.grid-container');
-    const safeCellsCount = $('#safeCellsCount');
-    const minesCount = $('#minesCount');
-    const startButton = $('.start-button');
-    const betInput = $('#betInput'); // Assuming you have an input with ID betInput
-    const minesMenu = $('#minesMenu');
-    const multipliersContainer = $('.multipliers-container');
 
-    let isGameStarted = false;
-    let totalCells = 25; // Default totalCells value
-    let mineCount = 1; // Default number of mines
-    let mineIndices = [];
-    let currentMultiplierIndex = 0;
-    
-    const multipliers = [
-        1, 1.03, 1.12, 1.23, 1.35, 1.5, 1.66, 1.86, 2.09, 2.37,
-        2.71, 3.13, 3.65, 4.31, 5.18, 6.33, 7.91, 10.17, 13.57,
-        18.99, 28.49, 47.49, 94.99, 284.99
-    ];
-
-    function ensureDocumentIsScrollable() {
-        const isScrollable =
-          document.documentElement.scrollHeight > window.innerHeight;
-        if (!isScrollable) {
-          document.documentElement.style.setProperty(
-            "height",
-            "calc(100vh + 1px)",
-            "important"
-          );
-        }
-      }
-      function preventCollapse() {
-        if (window.scrollY === 0) {
-          window.scrollTo(0, 1);
-        }
-      }
-
-      const scrollableElement = document.querySelector(".scrollable-element");
-      scrollableElement.addEventListener("touchstart", preventCollapse);
-
-      window.addEventListener("load", ensureDocumentIsScrollable);
-
-
-
-
-
-
-
-
-
-
-    function createGrid() {
-        gridContainer.empty(); // Clear the grid
-        updateInfoBox();
-        for (let i = 0; i < totalCells; i++) {
-            const cell = $('<div class="grid-item"><span></span></div>');
-            gridContainer.append(cell);
-        }
-        if (!isGameStarted) {
-            $('.grid-item').off('click'); // Remove any existing click listeners
-        }
-    }
-
-    function generateMineIndices() {
-        mineIndices = [];
-        while (mineIndices.length < mineCount) {
-            const newIndex = Math.floor(Math.random() * totalCells);
-            if (!mineIndices.includes(newIndex)) {
-                mineIndices.push(newIndex);
-            }
-        }
-    }
-
-    function placeMines() {
-        generateMineIndices();
-        $('.grid-item').each(function(index) {
-            if (mineIndices.includes(index)) {
-                $(this).data('isMine', true);
-                $(this).find('span').text('X').hide(); // Mark mine but hide it initially
-            } else {
-                $(this).data('isMine', false);
-            }
+        $(document).ready(function() {
+          // Handle dropdown show on click
+          $('.dropdown-btn-nav').click(function(event) {
+              console.log("Dropdown button clicked"); // Check if this function is triggered
+              // Toggle dropdown content visibility
+              $(this).closest('.navigation-bar').find('.css-1vmqozk').toggle();
+              event.stopPropagation(); // Prevent event bubbling
+          });
+        
+          // Toggle dropdown menu visibility on button click
+          $('#dropdown-btn-nav').click(function(event) {
+              var $element = $('.css-64qf3w');
+              if ($element.css('display') === 'none') {
+                  $element.css('display', 'flex');
+              } else {
+                  $element.css('display', 'none');
+              }
+              event.stopPropagation(); // Prevent event bubbling
+          });
+        
+          // Click event for the first button
+          $('.css-1ane4l8').click(function() {
+              // Remove balance-type class from all buttons
+              $('.css-1ane4l8, .css-1lppsyv').removeClass('balance-type');
+        
+              // Add balance-type class to the clicked button
+              $(this).addClass('balance-type');
+        
+              // Remove SVG from all other buttons
+              $('.css-1lppsyv .css-1etw0jx').empty();
+        
+              // Create SVG element
+              var svg = '<svg viewBox="0 0 20 20" focusable="false" class="chakra-icon css-lp8m3p" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.958 12.625l7.063-7.063a.811.811 0 01.594-.25c.229 0 .427.084.593.25.167.167.25.365.25.594 0 .23-.083.427-.25.594l-7.666 7.667a.8.8 0 01-.584.25.8.8 0 01-.583-.25l-3.583-3.584a.775.775 0 01-.24-.593.85.85 0 01.26-.594.811.811 0 01.594-.25c.23 0 .427.083.594.25l2.958 2.979z"></path></svg>';
+        
+              // Replace content of the div with the SVG
+              $(this).find('.css-qra6ta').html(svg);
+          });
+        
+          // Click event for the second button
+          $('.css-1lppsyv').click(function() {
+              // Remove balance-type class from all buttons
+              $('.css-1ane4l8, .css-1lppsyv').removeClass('balance-type');
+        
+              // Add balance-type class to the clicked button
+              $(this).addClass('balance-type');
+        
+              // Remove SVG from all other buttons
+              $('.css-1ane4l8 .css-qra6ta').empty();
+        
+              // Create SVG element
+              var svg = '<svg viewBox="0 0 20 20" focusable="false" class="chakra-icon css-lp8m3p" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M7.958 12.625l7.063-7.063a.811.811 0 01.594-.25c.229 0 .427.084.593.25.167.167.25.365.25.594 0 .23-.083.427-.25.594l-7.666 7.667a.8.8 0 01-.584.25.8.8 0 01-.583-.25l-3.583-3.584a.775.775 0 01-.24-.593.85.85 0 01.26-.594.811.811 0 01.594-.25c.23 0 .427.083.594.25l2.958 2.979z"></path></svg>';
+        
+              // Replace content of the div with the SVG
+              $(this).find('.css-1etw0jx').html(svg);
+          });
+        
+          // Hide element when clicking outside of it
+          $(document).click(function(event) {
+              if (!$(event.target).closest('.css-64qf3w, #dropdown-btn-nav').length) {
+                  $('.css-64qf3w').css('display', 'none');
+              }
+          });
         });
-    }
-
-    function handleCellClick(cell, index) {
-        if (!isGameStarted) return;
-
-        const isMine = cell.data('isMine');
-        if (isMine) {
-            cell.addClass('mine');
-            cell.find('span').css('visibility', 'visible');
-            setTimeout(() => {
-                alert('You hit a mine! Game restarts.');
-                startGame();
-                currentMultiplierIndex = 0; // Reset current multiplier index
-                updateMultiplierBoxes(); // Update multiplier boxes visually
-            }, 1000); // Adjust timing as needed
-        } else {
-            cell.addClass('safe');
-            cell.off('click'); // Remove click event for safe cell
-            currentMultiplierIndex++;
-            updateMultiplierBoxes();
-            checkWinCondition();
+        
+        
+        const tJ = {
+          v: "4.8.0",
+          meta: {
+            g: "LottieFiles AE 3.0.0",
+            a: "",
+            k: "",
+            d: "",
+            tc: "",
+          },
+          fr: 60,
+          ip: 0,
+          op: 60,
+          w: 214,
+          h: 214,
+          nm: "line-boom",
+          ddd: 0,
+          assets: [],
+          layers: [
+            {
+              ddd: 0,
+              ind: 1,
+              ty: 4,
+              nm: "Shape Layer 1",
+              sr: 1,
+              ks: {
+                o: { a: 0, k: 100, ix: 11 },
+                r: { a: 0, k: 0, ix: 10 },
+                p: { a: 0, k: [28, 44, 0], ix: 2 },
+                a: { a: 0, k: [-358.5, -216.5, 0], ix: 1 },
+                s: { a: 0, k: [100, 100, 100], ix: 6 },
+              },
+              ao: 0,
+              shapes: [
+                {
+                  ty: "gr",
+                  it: [
+                    {
+                      ind: 0,
+                      ty: "sh",
+                      ix: 1,
+                      ks: {
+                        a: 0,
+                        k: {
+                          i: [
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                          ],
+                          o: [
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                          ],
+                          v: [
+                            [-358.5, -216.5],
+                            [-363.5, -133],
+                            [-296.5, -230.5],
+                            [-346.5, -55],
+                            [-274, -189.5],
+                            [-272, -134.5],
+                            [-219, -209],
+                            [-223, -146],
+                            [-185.5, -181.5],
+                          ],
+                          c: false,
+                        },
+                        ix: 2,
+                      },
+                      nm: "Path 1",
+                      mn: "ADBE Vector Shape - Group",
+                      hd: false,
+                    },
+                    {
+                      ty: "tm",
+                      s: {
+                        a: 1,
+                        k: [
+                          {
+                            i: { x: [0.25], y: [1] },
+                            o: { x: [0.33], y: [0] },
+                            t: 10,
+                            s: [0],
+                          },
+                          {
+                            i: { x: [0.833], y: [1] },
+                            o: { x: [0.33], y: [0] },
+                            t: 30,
+                            s: [0],
+                          },
+                          {
+                            i: { x: [0.833], y: [1] },
+                            o: { x: [0.167], y: [0] },
+                            t: 35,
+                            s: [0],
+                          },
+                          { t: 55, s: [100] },
+                        ],
+                        ix: 1,
+                      },
+                      e: {
+                        a: 1,
+                        k: [
+                          {
+                            i: { x: [0.25], y: [1] },
+                            o: { x: [0.33], y: [0] },
+                            t: 0,
+                            s: [0],
+                          },
+                          {
+                            i: { x: [0.833], y: [1] },
+                            o: { x: [0.33], y: [0] },
+                            t: 20,
+                            s: [100],
+                          },
+                          {
+                            i: { x: [0.833], y: [1] },
+                            o: { x: [0.167], y: [0] },
+                            t: 25,
+                            s: [100],
+                          },
+                          { t: 45, s: [100] },
+                        ],
+                        ix: 2,
+                      },
+                      o: { a: 0, k: 0, ix: 3 },
+                      m: 1,
+                      ix: 2,
+                      nm: "Trim Paths 1",
+                      mn: "ADBE Vector Filter - Trim",
+                      hd: false,
+                    },
+                    {
+                      ty: "gs",
+                      o: { a: 0, k: 100, ix: 9 },
+                      w: { a: 0, k: 28, ix: 10 },
+                      g: {
+                        p: 3,
+                        k: {
+                          a: 0,
+                          k: [
+                            0,
+                            1,
+                            0.212,
+                            0.231,
+                            0.5,
+                            1,
+                            0.312,
+                            0.327,
+                            1,
+                            1,
+                            0.412,
+                            0.424,
+                          ],
+                          ix: 8,
+                        },
+                      },
+                      s: { a: 0, k: [-182, -180], ix: 4 },
+                      e: { a: 0, k: [-363, -215], ix: 5 },
+                      t: 1,
+                      lc: 1,
+                      lj: 1,
+                      ml: 4,
+                      ml2: { a: 0, k: 4, ix: 13 },
+                      bm: 0,
+                      nm: "Gradient Stroke 1",
+                      mn: "ADBE Vector Graphic - G-Stroke",
+                      hd: false,
+                    },
+                    {
+                      ty: "tr",
+                      p: { a: 0, k: [0, 0], ix: 2 },
+                      a: { a: 0, k: [0, 0], ix: 1 },
+                      s: { a: 0, k: [100, 100], ix: 3 },
+                      r: { a: 0, k: 0, ix: 6 },
+                      o: { a: 0, k: 100, ix: 7 },
+                      sk: { a: 0, k: 0, ix: 4 },
+                      sa: { a: 0, k: 0, ix: 5 },
+                      nm: "Transform",
+                    },
+                  ],
+                  nm: "Shape 1",
+                  np: 4,
+                  cix: 2,
+                  bm: 0,
+                  ix: 1,
+                  mn: "ADBE Vector Group",
+                  hd: false,
+                },
+              ],
+              ip: 0,
+              op: 60,
+              st: 0,
+              bm: 0,
+            },
+          ],
+          markers: [],
+        };
+        
+        const eJ = {
+          v: "4.8.0",
+          meta: {
+            g: "LottieFiles AE 3.0.0",
+            a: "",
+            k: "",
+            d: "",
+            tc: "",
+          },
+          fr: 60,
+          ip: 0,
+          op: 60,
+          w: 214,
+          h: 214,
+          nm: "text-boom",
+          ddd: 0,
+          assets: [],
+          layers: [
+            {
+              ddd: 0,
+              ind: 1,
+              ty: 4,
+              nm: "BOOM! 2 Outlines",
+              sr: 1,
+              ks: {
+                o: {
+                  a: 1,
+                  k: [
+                    { i: { x: [0.833], y: [0.833] }, o: { x: [0.167], y: [0.167] }, t: 30, s: [100] },
+                    { t: 55, s: [0] },
+                  ],
+                  ix: 11,
+                },
+                r: { a: 0, k: 0, ix: 10 },
+                p: { a: 0, k: [107, 107, 0], ix: 2 },
+                a: { a: 0, k: [1.04, -11.2, 0], ix: 1 },
+                s: {
+                  a: 1,
+                  k: [
+                    { i: { x: [0, 0, 0], y: [1, 1, 1] }, o: { x: [0.05, 0.05, 0.05], y: [0, 0, 0] }, t: 0, s: [0, 0, 100] },
+                    { t: 55, s: [100, 100, 100] },
+                  ],
+                  ix: 6,
+                },
+              },
+              ao: 0,
+              shapes: [
+                {
+                  ty: "gr",
+                  it: [
+                    {
+                      ind: 0,
+                      ty: "sh",
+                      ix: 1,
+                      ks: {
+                        a: 0,
+                        k: {
+                          i: [
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                          ],
+                          o: [
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                            [0, 0],
+                          ],
+                          v: [
+                            [-19.173, -0.118],
+                            [-3.093, 2.232],
+                            [1.813, -5.348],
+                            [9.977, 2.232],
+                            [18.141, -0.118],
+                            [10.977, 5.348],
+                            [14.141, 13.512],
+                            [1.813, 8.232],
+                            [-10.515, 13.512],
+                          ],
+                          c: false,
+                        },
+                        ix: 2,
+                      },
+                      nm: "Path 1",
+                      mn: "ADBE Vector Shape - Group",
+                      hd: false,
+                    },
+                    {
+                      ty: "tm",
+                      s: { a: 0, k: 0, ix: 1 },
+                      e: { a: 0, k: 100, ix: 2 },
+                      o: { a: 0, k: 0, ix: 3 },
+                      m: 1,
+                      ix: 2,
+                      nm: "Trim Paths 1",
+                      mn: "ADBE Vector Filter - Trim",
+                      hd: false,
+                    },
+                    {
+                      ty: "fl",
+                      c: { a: 0, k: [0, 0, 0, 1], ix: 4 },
+                      o: { a: 0, k: 100, ix: 5 },
+                      r: 1,
+                      nm: "Fill 1",
+                      mn: "ADBE Vector Graphic - Fill",
+                      hd: true,
+                    },
+                    {
+                      ty: "tr",
+                      p: { a: 0, k: [17.773, 2.632], ix: 2 },
+                      a: { a: 0, k: [-8.517, 7.637], ix: 1 },
+                      s: { a: 0, k: [100, 100], ix: 3 },
+                      r: { a: 0, k: 0, ix: 6 },
+                      o: { a: 0, k: 100, ix: 7 },
+                      sk: { a: 0, k: 0, ix: 4 },
+                      sa: { a: 0, k: 0, ix: 5 },
+                      nm: "Transform",
+                      mn: "ADBE Vector Group",
+                      hd: false,
+                    },
+                  ],
+                  nm: "BOOM! 2 Outlines",
+                  np: 4,
+                  cix: 2,
+                  bm: 0,
+                  ix: 1,
+                  mn: "ADBE Vector Group",
+                  hd: false,
+                },
+              ],
+              ip: 0,
+              op: 60,
+              st: 0,
+              bm: 0,
+            },
+          ],
+          markers: [],
+        };
+        
+        
+        
+        function loadAnimations() {
+          const animation1 = lottie.loadAnimation({
+              container: document.getElementById('lottie1'),
+              animationData: tJ,
+              autoplay: false, // Set autoplay to false
+        
+              loop: false
+          });
+        
+          const animation2 = lottie.loadAnimation({
+              container: document.getElementById('lottieText1'),
+              animationData: eJ,
+              loop: false
+          });
         }
-    }
-
-    function checkWinCondition() {
-        const safeCellsOpened = $('.grid-item.safe').length;
-        if (safeCellsOpened === totalCells - mineCount) {
-            alert('Congratulations! You found all safe cells.');
-            startGame();
+        
+        
+        $(document).ready(function() {
+          const gridContainer = $('.grid-container');
+          const safeCellsCount = $('#safeCellsCount');
+          const minesCount = $('#minesCount');
+          const startButton = $('.start-button');
+          const claimButton = $('.claim-button');
+          const balanceDisplay = $('#balance');
+          const betInput = $('#betInput'); // Assuming you have an input with ID betInput
+          const minesMenu = $('#minesMenu');
+          const multipliersContainer = $('.multipliers-container');
+          const minesCountBtnTxt = $('.css-15288wb'); // Corrected selector syntax
+        
+        
+          
+          let isGameStarted = false;
+          let totalCells = 25; // Default totalCells value
+          let mineCount = 1; // Default number of mines
+          let mineIndices = [];
+          let currentMultiplierIndex = 0;
+          let userBalance = 100.00; // Initial user balance
+          let currentBet = 1.28; // Default bet amount
+        
+          const multipliers = {
+            multipliers1: [
+              1, 1.03, 1.12, 1.23, 1.35, 1.5, 1.66, 1.86, 2.09, 2.37,
+              2.71, 3.13, 3.65, 4.31, 5.18, 6.33, 7.91, 10.17, 13.57,
+              18.99, 28.49, 47.49, 94.99, 284.99
+            ],
+            multipliers2: [
+              1.03, 1.12, 1.23, 1.35, 1.5, 1.66, 1.86, 2.09, 2.37, 
+              2.71, 3.13, 3.65, 4.31, 5.18, 6.33, 7.91, 10.17, 13.57, 
+              18.99, 28.49, 47.49, 94.99, 284.99
+            ],
+            multipliers3: [
+              1.07, 1.23, 1.41, 1.64, 1.91, 2.25, 2.67, 
+              3.21, 3.90, 4.80, 6.00, 7.63, 9.93, 13.24, 
+              18.20, 26.01, 39.01, 62.42, 109.25, 218.50, 
+              546.25, 2185.00
+            ],
+            multipliers4: [
+              1.13, 1.35, 1.64, 2.00, 2.48, 3.10, 3.92, 5.04, 
+              6.60, 8.80, 12.00, 16.80, 24.27, 36.41, 57.22, 
+              95.37, 171.67, 343.35, 801.16, 2403.49, 12017.49
+            ],
+            multipliers5: [
+              1.18, 1.50, 1.91, 2.48, 3.25, 4.34, 5.89, 8.15, 
+              11.55, 16.80, 25.21, 39.21, 63.72, 109.24, 200.29, 
+              400.58, 901.31, 2403.49, 8412.24, 50473.49
+            ],
+            multipliers6: [
+              1.25, 1.66, 2.25, 3.10, 4.34, 6.20, 9.06, 13.59, 21.00,
+              33.61, 56.02, 98.04, 182.08, 364.16, 801.16, 2002.91,
+              6008.75, 24035.00, 168245.00
+            ],
+            multipliers7: [
+              1.31, 1.86, 2.67, 3.92, 5.89, 9.06, 14.34, 23.48,
+              39.91, 70.96, 133.06, 266.12, 576.59, 1383.83, 3805.54,
+              12685.13, 57083.12, 456664.99
+            ],
+            multipliers8: [
+              1.39, 2.09, 3.21, 5.04, 8.15, 13.59, 23.48, 42.26,
+              79.83, 159.67, 342.15, 798.36, 2075.74, 6227.24,
+              22833.24, 114166.24, 1027496.24
+            ],
+            multipliers9: [
+              1.48, 2.37, 3.90, 6.60, 11.55, 21.00, 39.91, 79.83, 
+              169.65, 387.77, 969.44, 2714.44, 8821.93, 35287.74, 
+              194082.62, 1940826.24
+            ],
+            multipliers10: [
+              1.58, 2.71, 4.80, 8.80, 16.80, 33.61, 70.96, 159.67, 387.77, 1034.07, 3102.21, 10857.76, 47050.33, 282302.00, 3105322.00
+            ],
+            multipliers11: [
+              1.69, 3.13, 6.00, 12.00, 25.21, 56.02, 133.06, 342.15, 969.44, 3102.21, 11633.32, 54288.84, 352877.50, 4234530.00
+            ],
+            multipliers12: [
+              1.82, 3.65, 7.63, 16.80, 39.21, 98.04, 266.12, 798.36, 2714.44, 10857.76, 54288.84, 380021.92, 4940284.99
+            ],
+            multipliers13: [
+              1.97, 4.31, 9.93, 24.27, 63.72, 182.08, 576.59, 2075.75, 8821.93, 47050.33, 352877.50, 4940285.00
+            ],
+            multipliers14: [
+              2.15, 5.18, 13.24, 36.41, 109.25, 364.16, 1383.83, 6227.25, 35287.75, 282302.00, 4234530.00
+            ],
+            multipliers15: [
+              2.37, 6.33, 18.20, 57.22, 200.29, 801.16, 3805.54, 22833.24, 194082.62, 3105321.99
+            ],
+            multipliers16: [
+              2.63, 7.91, 26.01, 95.37, 400.58, 2002.91, 12685.13, 114166.25, 1940826.25
+            ],
+            multipliers17: [
+              2.96, 10.17, 39.01, 171.67, 901.31, 6008.75, 57083.12, 1027496.25
+            ],
+            multipliers18: [
+              3.39, 13.57, 62.42, 343.35, 2403.5, 24035, 456665
+            ],
+            multipliers19: [
+              3.95, 19, 109.25, 801.16, 8412.25, 168245
+            ],
+            multipliers20: [
+              4.75, 28.5, 218.5, 2403.5, 50473.5
+            ],
+            multipliers21: [
+              5.93, 47.5, 546.25, 12017.5
+            ],
+            multipliers22: [
+              7.91, 95, 2185
+            ],
+            multipliers23: [
+              11.87, 285
+            ],
+            multipliers24: [
+              23.75
+            ]
+          };
+          
+          // Function to update user balance display
+          function updateBalance(amount) {
+              userBalance += amount;
+              balanceDisplay.text(`Balance: $${userBalance.toFixed(2)}`);
+          }
+          updateMinesCountBtn()
+          updateInfoBox()
+          // Function to deduct bet from balance and start the game
+          function deductBetFromBalanceAndStart() {
+              const selectedBet = parseFloat(betInput.val());
+              if (selectedBet > 0 && userBalance >= selectedBet) {
+                  currentBet = selectedBet;
+                  userBalance -= currentBet;
+                  updateBalanceDisplay();
+                  startGame();
+              } else {
+                  alert('Invalid bet amount or insufficient balance.');
+              }
+          }
+        
+          // Function to update bet size
+          function updateBetSize(newBetSize) {
+              betInput.val(newBetSize.toFixed(2));
+              currentBet = newBetSize;
+          }
+        
+          // Function to update balance display
+          function updateBalanceDisplay() {
+              balanceDisplay.text(`Balance: $${userBalance.toFixed(2)}`);
+          }
+        
+          // Function to update info box displaying safe cells count and mines count
+          function updateInfoBox() {
+              safeCellsCount.text(totalCells - mineCount);
+              minesCount.text(mineCount);
+          }
+          function updateMinesCountBtn() {
+              minesCountBtnTxt.text(mineCount);
+          }
+          // Function to create the grid dynamically
+          function createGrid() {
+              gridContainer.empty(); // Clear the grid
+              updateInfoBox();
+              for (let i = 0; i < totalCells; i++) {
+                  const cell = $('<div class="grid-item"><span></span></div>');
+                  gridContainer.append(cell);
+        
+              }
+              if (!isGameStarted) {
+                  $('.grid-item').off('click');
+                  const gridoverflow = $('<div class="css-cjeilk"><div class="css-oig4i9"><div class="css-w4ji5f">Սեղմեք<br> Խաղալ</div><div class="css-336v9b">Սեղմեք<br> Խաղալ</div></div></div>');
+                  gridContainer.append(gridoverflow);// Remove any existing click listeners
+              } 
+              
+        
+        
+          }
+        
+          // Function to generate random mine indices
+          function generateMineIndices() {
+              mineIndices = [];
+              while (mineIndices.length < mineCount) {
+                  const newIndex = Math.floor(Math.random() * totalCells);
+                  if (!mineIndices.includes(newIndex)) {
+                      mineIndices.push(newIndex);
+                  }
+              }
+          }
+        
+        // Function to place mines on the grid
+        function placeMines() {
+          generateMineIndices();
+          $('.grid-item').each(function(index) {
+              if (mineIndices.includes(index)) {
+                  $(this).data('isMine', true);
+                  $(this).find('span').text('X').hide(); // Mark mine but hide it initially
+                  $(this).append('<div id="lottie1"></div>');
+              } else {
+                  $(this).data('isMine', false);
+              }
+          });
         }
-    }
-
-    function updateInfoBox() {
-        safeCellsCount.text(totalCells - mineCount);
-        minesCount.text(mineCount);
-    }
-
-    function startGame() {
-        isGameStarted = true;
-        createGrid();
-        placeMines();
-        $('.grid-item').on('click', function() {
-            const index = $('.grid-item').index(this);
-            handleCellClick($(this), index);
+        
+        const dropdownBtnNav = document.getElementById('dropdown-btn-nav');
+        const arrowSvgNav = document.getElementById('arrow-svg-nav');
+        let isArrowDownNav = true;
+        
+        dropdownBtnNav.addEventListener('click', function() {
+          // Toggle between arrow down and arrow up
+          if (isArrowDownNav) {
+            arrowSvgNav.innerHTML = `
+                  <path d="M6 15L12 9L18 15" stroke="url(#paint0_linear_6304_8524)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <defs>
+                      <linearGradient id="paint0_linear_6304_8524" x1="6" y1="9" x2="10.8" y2="18.6" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#33BBFF"></stop>
+                          <stop offset="1" stop-color="#0088CC"></stop>
+                      </linearGradient>
+                  </defs>
+              `;
+              isArrowDownNav = false;
+          } else {
+            arrowSvgNav.innerHTML = `
+                  <path d="M6 9L12 15L18 9" stroke="url(#paint0_linear_6304_8524)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <defs>
+                      <linearGradient id="paint0_linear_6304_8524" x1="6" y1="9" x2="10.8" y2="18.6" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#33BBFF"></stop>
+                          <stop offset="1" stop-color="#0088CC"></stop>
+                      </linearGradient>
+                  </defs>
+              `;
+              isArrowDownNav = true;
+          }
         });
-    }
-
-    function splitBet() {
-        let currentBet = parseFloat(betInput.val());
-        if (currentBet > 0.01) {
-            betInput.val((currentBet / 2).toFixed(2));
+        
+        
+        
+        
+        
+        
+          const dropdownBtn = document.getElementById('dropdown-btn');
+          const arrowSvg = document.getElementById('arrow-svg');
+          let isArrowDown = true;
+        
+          dropdownBtn.addEventListener('click', function() {
+              // Toggle between arrow down and arrow up
+              if (isArrowDown) {
+                  arrowSvg.innerHTML = `
+                      <path d="M6 15L12 9L18 15" stroke="url(#paint0_linear_6304_8524)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <defs>
+                          <linearGradient id="paint0_linear_6304_8524" x1="6" y1="9" x2="10.8" y2="18.6" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#33BBFF"></stop>
+                              <stop offset="1" stop-color="#0088CC"></stop>
+                          </linearGradient>
+                      </defs>
+                  `;
+                  isArrowDown = false;
+              } else {
+                  arrowSvg.innerHTML = `
+                      <path d="M6 9L12 15L18 9" stroke="url(#paint0_linear_6304_8524)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <defs>
+                          <linearGradient id="paint0_linear_6304_8524" x1="6" y1="9" x2="10.8" y2="18.6" gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#33BBFF"></stop>
+                              <stop offset="1" stop-color="#0088CC"></stop>
+                          </linearGradient>
+                      </defs>
+                  `;
+                  isArrowDown = true;
+              }
+          });
+        
+              // Function to handle changes in the mines count selection
+        
+        function updateMineCount() {
+          var selectedButton = $('.css-r4k430.selected');
+          if (selectedButton.length > 0) {
+              mineCount = parseInt(selectedButton.find('.css-1a5v845').text(), 10); // Update mineCount variable
+              updateInfoBox();
+              updateMinesCountBtn()
+              createMultiplierBoxes()
+              $('.css-1hl6eao').hide();
+              // Update the info box displaying safe cells count and mines count
+          }
         }
-    }
-
-    function doubleBet() {
-        let currentBet = parseFloat(betInput.val());
-        betInput.val((currentBet * 2).toFixed(2));
-    }
-
-    function toggleMinesMenu() {
-        // Toggle visibility of mines menu
-        minesMenu.toggleClass('active');
-
-        // Position the mines menu relative to the mine button
-        const buttonPosition = $('.popup-button').offset();
-        minesMenu.css({
-            bottom: $(window).height() - buttonPosition.top + 10,
-            right: $(window).width() - (buttonPosition.left + $('.popup-button').outerWidth())
+        
+        
+        $(document).ready(function() {
+          // Handle dropdown show on click
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          $('.css-r4k430').click(function() {
+              // Remove 'selected' class from all buttons
+              $('.css-r4k430').removeClass('selected');
+          
+              // Add 'selected' class to the clicked button
+              $(this).addClass('selected');
+          
+              // Update mines count based on the clicked button
+              var newMinesCount = parseInt($(this).find('.css-1a5v845').text(), 10);
+        
+              if (!isNaN(newMinesCount)) {
+                  $('.css-r4k430 selected').text(newMinesCount); // Update mines count display
+                  updateMineCount();
+                  // Update the internal mineCount variable
+              }
+          });
+          
+          // Handle dropdown show on click
+          $('.dropdown-btn').click(function() {
+              // Find the closest .dropdown element and toggle its .css-1hl6eao dropdown content
+              $(this).closest('.dropdown').find('.css-1hl6eao').toggle();
+          });
+        
+          // Close dropdown on click outside
+          $(document).click(function(event) {
+              if (!$(event.target).closest('.dropdown').length) {
+                  $('.css-1hl6eao').hide();
+              }
+          });
+        
+          // Prevent dropdown close on click inside
+          $('.css-1hl6eao').click(function(event){
+              event.stopPropagation();
+          });
         });
-    }
-
-    function updateMineCount() {
-        mineCount = parseInt($('#minesSelect').val());
-        updateInfoBox();
-    }
-
-    function createMultiplierBoxes() {
-        multipliersContainer.empty();
-        multipliers.forEach((multiplier, index) => {
-            const box = $('<div class="multiplier-box"></div>');
-            if (index === currentMultiplierIndex) {
-                box.addClass('current');
-            }
-            box.text(multiplier.toFixed(2));
-            multipliersContainer.append(box);
+        
+        // Function to handle click on grid cells
+        function handleCellClick(cell, index) {
+          if (!isGameStarted) return; // Check if the game has started
+          
+          const isMine = cell.data('isMine'); // Check if the clicked cell is a mine
+          if (isMine) {
+              cell.addClass('mine'); // Add 'mine' class to visually mark the mine
+              cell.find('span').css('visibility', 'visible'); // Show any hidden content (if needed)
+              claimButton.hide();
+              startButton.show();
+        
+        
+              userBalance -= currentBet;
+              setTimeout(() => {
+                  updateBalanceDisplay();
+                  createGrid();
+                  placeMines();
+                  $('.grid-item').on('click', function() {
+                      const index = $('.grid-item').index(this);
+                      handleCellClick($(this), index);
+                  });  
+              }, 1000);
+        
+              // Play explosion animation (optional)
+              const explosionAnimation = lottie.loadAnimation({
+                  container: cell.find('#lottie1')[0], // Assuming you want to play animation inside the clicked cell
+                  animationData: tJ,
+                  loop: false,
+                  rendererSettings: {
+                      preserveAspectRatio: 'xMidYMid meet',
+                      zIndexBehavior: 'useParent'
+                  }
+              });
+        
+              // Disable all grid item clicks after mine is hit
+              $('.grid-item').off('click');
+        
+              setTimeout(() => {
+                  // End the game and reset state
+                  currentMultiplierIndex = 0; // Reset multiplier index
+                  updateMultiplierBoxes(); // Update UI with new multiplier index
+                  isGameStarted = false; // End the game
+              }, 1000); // Adjust timing as needed
+          } else {
+              cell.addClass('safe'); // Add 'safe' class to visually mark safe cells
+              cell.off('click'); // Disable click event for safe cell
+              cell.find('span').css('background-image', 'none'); // Remove any background image (if needed)
+        
+              currentMultiplierIndex++; // Increment multiplier index
+              updateMultiplierBoxes(); // Update UI with new multiplier index
+              checkWinCondition(); // Check if win condition is met
+          }
+        }
+        
+        
+        // Function to play explosion animation
+        
+          // Function to check win condition
+          function checkWinCondition() {
+              const safeCellsOpened = $('.grid-item.safe').length;
+              if (safeCellsOpened === totalCells - mineCount) {
+                  alert('Congratulations! You found all safe cells.');
+                  startGame();
+              }
+          }
+        
+          function startGame() {
+              isGameStarted = true;
+              createGrid();
+              placeMines();
+              $('.grid-item').on('click', function() {
+                  const index = $('.grid-item').index(this);
+                  handleCellClick($(this), index);
+              });
+              startButton.hide();
+              claimButton.show();
+          }
+        
+          // Function to split the bet
+          function splitBet() {
+              let currentBet = parseFloat(betInput.val());
+              if (currentBet > 0.01) {
+                  betInput.val((currentBet / 2).toFixed(2));
+              }
+          }
+        
+          // Function to double the bet
+          function doubleBet() {
+              let currentBet = parseFloat(betInput.val());
+              betInput.val((currentBet * 2).toFixed(2));
+          }
+        
+          // Function to toggle mines menu visibility
+          function toggleMinesMenu() {
+              minesMenu.toggleClass('active');
+        
+              const buttonPosition = $('.popup-button').offset();
+              minesMenu.css({
+                  bottom: $(window).height() - buttonPosition.top + 10,
+                  right: $(window).width() - (buttonPosition.left + $('.popup-button').outerWidth())
+              });
+          }
+        
+        
+        
+          // Function to create multiplier boxes
+          function createMultiplierBoxes() {
+              multipliersContainer.empty();
+              multipliers[`multipliers${mineCount}`].forEach((multiplier, index) => {
+                const box = $('<div class="multiplier-box"></div>');
+                  if (index === currentMultiplierIndex) {
+                      box.addClass('current');
+                  }
+                  box.text(multiplier.toFixed(2));
+                  multipliersContainer.append(box);
+              });
+          }
+        
+          // Function to update multiplier boxes
+          function updateMultiplierBoxes() {
+              $('.multiplier-box').removeClass('current');
+              $('.multiplier-box').eq(currentMultiplierIndex).addClass('current');
+        
+              const currentBox = $('.multiplier-box.current');
+              const container = $('.multipliers-container');
+              const boxWidth = currentBox.outerWidth();
+              const scrollTo = currentBox.position().left + container.scrollLeft() - boxWidth / 1.5;
+        
+              container.animate({
+                  scrollLeft: scrollTo
+              }, 600);
+          }
+        
+          // Function to handle claiming winnings
+          function handleClaim() {
+              const safeCellsOpened = $('.grid-item.safe').length;
+              let winningsMultiplier = multipliers[minesCount][safeCellsOpened] || 1;
+              let winnings = parseFloat((currentBet * winningsMultiplier).toFixed(2));
+              let profit = parseFloat((winnings - currentBet).toFixed(2));
+              updateBalance(winnings);
+              startGame();
+              currentMultiplierIndex = 0; // Reset current multiplier index
+              updateMultiplierBoxes(); // Update multiplier boxes visually
+              claimButton.hide();
+              isGameStarted = false;
+        
+              startButton.show();
+              const gridoverflow = $(`<div class="css-9jmbsi" style="opacity: 1; transform: none;"><div class="css-12c555f"><div class="css-1g3zqnp">${winningsMultiplier}x</div><div class="css-70qvj9"><div class="css-43az19"></div><div class="css-1yd8k15">${winnings}</div></div></div><div class="css-1cx373v"></div></div>`);
+              gridContainer.append(gridoverflow);
+          }
+        
+        
+        
+          // Event listeners
+          startButton.on('click', deductBetFromBalanceAndStart);
+          claimButton.on('click', handleClaim);
+          betInput.on('input', function() {
+              updateBetSize(parseFloat($(this).val()));
+          });
+          $('#minesSelect').on('change', updateMineCount);
+          $('.css-lakxj1').on('click', function(event) {
+              const action = $(this).text().toLowerCase();
+              if (action === 'split') {
+                  splitBet();
+              } else if (action === 'x2') {
+                  doubleBet();
+              }
+          });
+          $('.popup-button').on('click', toggleMinesMenu);
+        
+          // Prevent collapsing when scrolling on touch devices
+          $(document).on('touchmove', function(event) {
+              if (event.target.closest('.grid-container') || event.target.closest('.multipliers-container')) {
+                  event.preventDefault();
+              }
+          });
+        
+          // Initialize the game and multipliers
+          createGrid();
+          createMultiplierBoxes();
+          updateBalanceDisplay(); // Update initial balance display
         });
-    }
-
-    function updateMultiplierBoxes() {
-        $('.multiplier-box').removeClass('current');
-        $('.multiplier-box').eq(currentMultiplierIndex).addClass('current');
-
-        // Get current multiplier box and its position
-        const currentBox = $('.multiplier-box.current');
-        const container = $('.multipliers-container');
-        const boxWidth = currentBox.outerWidth(); // Width of the current box
-        const scrollTo = currentBox.position().left + container.scrollLeft() - boxWidth / 1.5; // Adjusted scroll position
-
-        // Animate scroll to the adjusted position
-        container.animate({
-            scrollLeft: scrollTo
-        }, 600); // Adjust speed as needed
-    }
-
-    // Event Listeners
-    startButton.on('click', startGame);
-    $('#minesSelect').on('change', updateMineCount);
-
-    $('.button-container .button').on('click', function(event) {
-        const action = $(this).text().toLowerCase();
-        if (action === 'split') {
-            splitBet();
-        } else if (action === 'x2') {
-            doubleBet();
-        }
-    });
-
-    $('.popup-button').on('click', toggleMinesMenu);
-
-    // Prevent collapsing when scrolling on touch devices
-    $(document).on('touchmove', function(event) {
-        if (event.target.closest('.grid-container') || event.target.closest('.multipliers-container')) {
-            event.preventDefault();
-        }
-    });
-
-    // Initialize the game and multipliers
-    createGrid();
-    createMultiplierBoxes();
-});
-
-    </script>
-
-
+        
+          
+        
+        
+        
+          </script>
 </div>
 </body>
 </html>
+
+
+
