@@ -1,0 +1,18 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+      {
+          "type": "Feature",
+          "geometry": {
+              "type": "Point",
+              "coordinates": [44.503490, 40.177200] 
+          },
+          "properties": {
+              "name": "Product 1",
+              "price": "$10.00",
+              "description": "This is a great product.",
+              "image": "img.png"
+          }
+      }
+  ]
+}

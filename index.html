@@ -3,682 +3,833 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Web App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Map with Product Locations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="style.css" />
     <style>
-    
-    /* Reset and base styles */
-      * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-      }
-      
-      body {
-          font-family: 'Roboto', sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          height: 100vh;
-          margin: 0;
-          background-color: rgb(10, 15, 29);
-          color: white;
-      }
-      
-      .grid-wrapper {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          width: 100%;
-          margin-bottom: 20px;
-      }
-      
-      .info-container {
-          display: flex;
-          justify-content: space-between;
-          width: 90%;
-          max-width: 600px;
-          margin-bottom: 20px;
-      }
-      
-      .info-box {
-          display: flex;
-          align-items: center;
-          background-color: rgb(25, 32, 51);
-          border-radius: 10px;
-          padding: 10px;
-          color: white;
-      }
-      
-      .info-icon {
-          font-size: 1.5rem;
-          margin-right: 5px;
-      }
-      
-      .grid-container {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 10px;
-          width: 90%;
-          max-width: 100%;
-          margin: auto;
-          padding: 20px;
-          background-color: rgb(25, 32, 51);
-          border-radius: 10px;
-          position: relative;
-          
-      }
-      
-      .grid-item {
-        box-shadow: rgb(14, 78, 109) 0px 4px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: linear-gradient(180deg, #1c89fe 100%, rgba(20, 26, 41, 0) 100%);
-          border-radius: 10px;
-          font-size: 1.5rem;
-          cursor: pointer;
-          transition: background-color 0.3s, transform 0.3s;
-          position: relative;
-          padding-top: 100%;
-      }
-      
-      .grid-item span {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          visibility: hidden;
-      }
-      
-      .grid-item.safe {
-          background-color: #4CAF50;
-          background-image: url('https://tonroll.com/static/media/rotatingDiamond.6b601b3dd1c845cb3ee7.gif');
-    background-size: cover; /* Adjust to fit the element */
-    background-repeat: no-repeat; 
-          
-      }
-      
-      .grid-item.mine {
-          background-color: #f44336;
-          animation: explode 0.5s forwards;
-      }
-      
-      .grid-item:hover {
-          transform: scale(1.05);
-      }
-      
-      .grid-item:active {
-          transform: scale(0.95);
-      }
-      
-      @keyframes explode {
+        #map {
+            height: 300px;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            margin: 0 auto;
+            
+        }
+        
+        
+        
+        * {
+            -webkit-tap-highretro-color: transparent;
+         }
+         .order-detail {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .order-list {
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centers items horizontally */
+        }
+        
+        .order-item {
+            color: white;
+            border-radius: 15px;
+            width: 90%;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #1d1d1d;
+        }
+        
+        *:focus {
+            outline: none;
+        }
+        .my-order-text {
+            padding-top: 10px;
+            font-size: 19px;
+            font-weight: 800;
+            color: white;
+            text-align: center; /* Center horizontally */
+        }
+        
+        .loading{
+            height:50px;
+            width: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor:progress;
+            margin: 0 auto;
+            border-radius: 50%;
+            border-top: 5px solid gold;
+            border-bottom: 5px solid transparent;
+            border-left: 5px solid gold;
+            border-right: 5px solid transparent;
+        
+            animation: loading 1s linear infinite;
+        }
+        
+        
+        
+        
+        @keyframes loading {
           0% {
-              transform: scale(1);
-              opacity: 1;
+           transform: rotate(0deg);
           }
           100% {
-              transform: scale(1.5);
-              opacity: 0;
+            transform: rotate(360deg);
           }
-      }
-      
-      .button-container {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-bottom: 20px;
-      }
-      
-      .start-button-container {
-          margin-bottom: 10px;
-          width: 90%;
-      }
-      
-      .start-button {
-          margin-top: 10px;
-          font-size: 1rem;
-          padding: 15px 20px;
-          cursor: pointer;
-          background:linear-gradient(135deg, rgb(22, 177, 255) 0%, rgb(56, 112, 227) 100%);
-          color: white;
-          border: none;
-          border-radius: 5px;
-          transition: background-color 0.3s;
-          width: 100%;
-      }
-      
-      .start-button:hover {
-          background-color: #0056b3;
-      }
-      
-
-      
-
-      
-
-      
-
-      
-      .popup-button {
-          font-size: 1rem;
-          padding: 10px 20px;
-          cursor: pointer;
-          background-color: #6c757d;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          transition: background-color 0.3s;
-      }
-      
-      .popup-button:hover {
-          background-color: #5a6268;
-      }
-      
-      .mines-menu {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    right: 0;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    display: none; /* Initially hidden */
-}
-
-
-.mines-menu.active {
-    display: block;
-}
-
-      
-      .mines-menu label {
-          display: block;
-          margin-bottom: 5px;
-          font-size: 0.9rem;
-      }
-      
-      .mines-menu select {
-          padding: 8px;
-          border-radius: 5px;
-          border: 1px solid #ccc;
-          font-size: 0.9rem;
-          width: 100%;
-      }
-
-      .multipliers-container {
-    padding: 10px;
-    background: linear-gradient(180deg, rgb(20, 26, 41) 0%, rgba(20, 26, 41, 0) 100%);
-    display: flex;
-    justify-content: flex-start; /* Align items to the left */
-    align-items: center;
-    margin-top: 10px;
-    width: 90%; /* Adjust width to leave space on both sides */
-    max-width: 600px; /* Set a maximum width if needed */
-    overflow-x: scroll; /* Enable horizontal scrolling */
-    overflow-y: hidden; /* Hide vertical scrolling */
-    border-radius: 10px;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-}
-
-.multipliers-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
-}
-
-.multipliers-inner {
-    display: flex;
-    justify-content: flex-start; /* Align items to the left */
-    align-items: center;
-    padding: 0; /* Remove padding to maintain alignment */
-}
-
-
-
-.multiplier-box {
-  
-    padding: 5px;
-    margin: 0 5px;
-    border: 2px solid rgb(25, 32, 51);
-    border-radius: 5px;
-    font-size: 0.9rem;
-    color:#ccc;
-    transition: transform 0.3s ease; /* Use transform for smooth scaling */
-}
-
-      
-      .multiplier-box.current {
-        border: 2px solid #28a745;
-
-          font-size: 1rem;
-          color: #28a745;
-
-      }
-
-      .css-gg4vpm {
-    display: flex;
-    -webkit-box-pack: justify;
-    justify-content: space-between;
-      }
-      .css-1ewlwsu {
-    width: 62.6%;
-}
-.css-ohxpp6 {
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 18px;
-}
-.css-14s4iyf {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    position: relative;
-}
-.css-14s4iyf {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    position: relative;
-}
-.css-15dxxqe {
-    color: #FFFFFF;
-    width: 100%;
-    min-width: 0px;
-    outline: transparent solid 2px;
-    outline-offset: 2px;
-    position: relative;
-    appearance: none;
-    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-    transition-duration: 200ms;
-    padding-inline-start: 1rem;
-    padding-inline-end: 1rem;
-    padding: 14px 126px 14px 42px;
-    height: 52px;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 20px;
-    border: 1px solid rgb(44, 55, 85);
-    border-radius: 8px;
-    background: #252E47;
-}
-.css-1czj2zp {
-    width: 24px;
-    height: 24px;
-    background: url(/static/media/demoCurrency.372a0f1….svg) center center / contain no-repeat;
-    position: absolute;
-    left: 16px;
-    z-index: 1;
-}
-.css-1oy4d2y {
-    display: flex;
-    -webkit-box-align: center;
-    align-items: center;
-    position: absolute;
-    right: 8px;
-    gap: 4px;
-    z-index: 1;
-}
-
-.css-lakxj1 {
-    border-color: #2c3755c1;
-    display: inline-flex;
-    appearance: none;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-    user-select: none;
-    position: relative;
-    white-space: nowrap;
-    vertical-align: middle;
-    outline-offset: 2px;
-    border-radius: 8px;
-    color: #FFFFFF;
-    min-width: 2.5rem;
-    padding-inline: 20px;
-    width: 52px;
-    height: 36px;
-    font-weight: 600;
-    font-size: 13px;
-    line-height: 18px;
-    background: #2C3755;
-    border: none;
-    outline: none;
-    /* Adjust padding and other styles as needed */
-    padding: 10px 20px;
-    cursor: pointer;
-    color: white;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}      .scrollable-element {
-        overflow-y: scroll;
-      }
-      </style>
-
-  </head>
+        }
+        
+        
+        
+        
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 9999; /* Ensure the modal is on top of everything */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); /* Darker background for better contrast */
+        }
+        
+        .modal-content {
+        position: relative; /* Ensure the pseudo-element is positioned relative to this element */
+        background: linear-gradient(to top, rgba(152, 255, 121, 1) 0%, rgb(21, 21, 21) 50%);
+        margin: 10% auto; /* Centering the modal */
+        padding: 20px;
+        width: 80%;
+        color: white;
+        max-width: 600px;
+        border-radius: 10px;
+        text-align: center; /* Centering text and content */
+        z-index: 1; /* Ensure the modal content is above the pseudo-element */
+        }
+        
+        .modal-content::before {
+        content: ""; /* Required to generate the pseudo-element */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(21, 21, 21, 0.6); /* Fixed background color */
+        z-index: -1; /* Place it behind the modal content */
+        border-radius: 10px; /* Match the border-radius of the modal content */
+        }
+        
+        
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        /* Additional styling for QR code and address */
+        #qr-code img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        #amount {
+            font-weight: bold;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #151515;
+        }
+        
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1d1d1d;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 20px;
+        }
+        
+        .navbar .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .navbar .menu {
+            display: flex;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar .menu li {
+            margin-left: 20px;
+        
+        }
+        
+        .navbar .menu li a {
+            font-size: 13px;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .navbar .menu li a:hover {
+            background-color: #575757;
+        }
+        
+        .product-menu {
+            position: absolute;
+            width: calc(100% - 40px);
+            max-width: 400px;
+            height: 40%;
+            background-color: #1d1d1d;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 15px;
+            padding: 10px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        #loading-animation {
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #ffffff;
+        }
+        
+        /* Add this CSS for the loading spinner */
+        .spinner {
+            border: 16px solid #f3f3f3; /* Light grey */
+            border-top: 16px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto; /* Center the spinner */
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .product-item {
+            background-color: #282828;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            transition: background-color 0.3s;
+            overflow: hidden;
+        }
+        .product-item:active {
+            background-color: #323232;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .buy-button {
+            background-color: #0056b3;
+            border-radius: 15px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .buy-button:hover {
+            background-color: #0056b3;
+        }
+        .product-location {
+            padding: 5px;
+            margin-top: 5px;
+            background-color: #5757571a;
+            border-radius: 11px;
+        }
+        
+        .product-type {
+            padding: 5px;
+            margin-top: 5px;
+            background-color: #5757571a;
+            border-radius: 11px;
+        }
+        .product-item img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 10px;
+        }
+        
+        .product-item .product-name {
+            position: relative;
+            border-radius: 11px;
+            font-weight: 500;
+            left: 0;
+                padding: 5px;
+            background-color: #5757571a;
+        }
+        .product-price2 {
+            margin-left: 100px;
+            font-size: 16px;
+            font-weight: 1000;
+            color: rgb(152, 255, 121);
+            padding: 5px;
+            max-width: 50px;
+            background-color: #2f2f2f;
+            border-radius: 11px;
+            position: relative;
+            box-shadow: 0px 10px 100px 20px rgba(144, 238, 144, 0.7)
+        }
+        .product-item .product-price {
+            font-size: 16px;
+            font-weight: 1000;
+            color: rgb(152, 255, 121);
+            padding: 5px;
+            max-width: 50px;
+            background-color: #2f2f2f;
+            border-radius: 11px;
+            position: relative;
+            box-shadow: 0px 10px 100px 20px rgba(144, 238, 144, 0.7)
+        }
+        .product-specific {
+            padding: 10px;
+            background-color: #2f2f2f;
+            border-radius: 10px;
+        }
+        .filters {
+            background-color:#282828 ;
+            border-radius:15px;
+            margin: 20px;
+            padding: 10px;
+            border: 2px solid #4d4c4c87;
+        }
+        
+        .filters label {
+            
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .filters select, .filters input {
+            max-width: 100px;
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 10px;
+            border: none;
+            background-color: #282828;
+            color: white;
+        }
+        
+        .filters button {
+            display: block;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+        
+        
+        .product-details-menu {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 500px;
+            background-color: #1d1d1d;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            z-index: 1000;
+        }
+        
+        .product-details-menu .close-btn {
+            background-color: #ff4c4c;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .telegram {
+            width: 30px;
+            margin: 0 auto;
+            display: flex;
+            color: white;
+            border-radius: 100px;
+            justify-content: space-between; 
+        }
+        .about-content {
+            padding-top: 10px;
+            
+            max-width: 400px;
+            width: 400px;
+            height: 200px;
+            border-radius: 15px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        
+            background-color: #292828;
+        }
+        
+        .company-name {
+            margin-bottom: 10px;
+        
+            margin-top: 10px;
+            display: flex;
+            color: white;
+            justify-content: space-around; 
+            }
+        .about-content-img {
+            display: flex;
+            width: 100px;
+            border-radius: 1000px;
+            margin: 0 auto;
+            justify-content: flex-end;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-content: space-between;
+        
+        }
+        .about-content2 {
+            max-width: 400px;
+            width: 400px;
+            height: 100vh;
+            border-radius: 15px;
+            margin: 0 auto;
+            background-color: #292828;
+        }</style>
+</head>
 <body>
-<div class="scrollable-element">
-    <div class="grid-wrapper">
+    <nav class="navbar">
+        <div class="logo">420</div>
+        <ul class="menu">
+            <li><a href="index.html">Գլխավոր մենյու</a></li>
+            <li><a href="about.html">Մեր մասին            </a></li>
+            <li><a href="services.html">Պատվերներ</a></li>
+        </ul>
+    </nav>
 
-        <div class="info-container">
-            <div class="info-box">
-                <div class="info-icon">💎</div>
-                <div id="safeCellsCount" class="info-value">24</div>
-            </div>
-            <div class="info-box">
-                <div class="info-icon">💣</div>
-                <div id="minesCount" class="info-value">1</div>
-            </div>
+    <!-- Main Menu with Map and Product Grid -->
+    <div class="main-menu">
+        <div id="map"></div>
+        <div class="filters">
+            <select id="location-filter" onchange="applyFilters()">
+                <option value="">Բոլոր Վայրերը
+                </option>
+                <option value="Ավան">Ավան</option>
+                <option value="Զեյթուն">Զեյթւն</option>
+                <option value="Բանգլադեշ">Բանգլադեշ</option>
+                <option value="3-րդ Մաս">3րդ Մաս</option>
+                <option value="Կոմիտաս">Կոմիտաս</option>
+                <option value="Էրեբունի">Երեբւնի</option>
+                <option value="Նորագավիթ">Նորագավիտ</option>
+                <option value="Շենգավիթ">Շենգավիտ</option>
+            </select>
+            <select id="type-filter" onchange="applyFilters()">
+                <option value="">Բոլոր Տեսակները
+                </option>
+                <option value="Indica">Indica</option>
+                <option value="Sativa">Sativa</option>
+            </select>
+            <input type="number" id="price-filter" placeholder="Մաքս գինը" step="0.01" min="0" oninput="applyFilters()">
+            <button id="apply-filters" onclick="applyFilters()">Որոնում</button>
         </div>
         
-        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
+        
+        <div class="product-menu">
+            <div class="product-grid" id="product-grid"></div>
         </div>
-        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>        <div class="grid-container">
-            <!-- Grid items will be dynamically generated -->
-
-
-        </div>
-        <div class="multipliers-container">
-          <div class="multipliers-inner">
-  
-          </div>
-  
-        </div>
-
     </div>
 
-    <div class="button-container">
+<!-- Modal for Payment Details -->
+<!-- Modal for Payment Details -->
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Վճարման մանրամասներ        </h2>
 
-      <div class="start-button-container">
-          <button class="start-button">Start Game</button>
-      </div>
-      <button class="popup-button" id="minesSelect">Mines</button>
-  </div>
-        <div class="css-gg4vpm">
-        <div class="css-1ewlwsu">
-            <div class="css-ohxpp6">Choose Amount</div>
-            <div class="css-14s4iyf">
-                <input type="text" id="betInput" class="chakra-input css-15dxxqe" value="1.28">
-                <div class="css-1czj2zp"></div>
-                <div class="css-1oy4d2y">
-                    <button type="button" class="css-lakxj1">x2</button>
-                    <button type="button" class="css-lakxj1">Split</button>
-                </div>
-            </div>
+        <div id="qr-code"></div>
+        <p id="dash-address">DASH Հասցե: <span id="address"></span></p>
+        <p id="amount">Գումարը: <span id="amount-value"></span> DASH</p>
+        <div class="loading"></div>
+
+        <!-- Added product details -->
+        <div id="product-details">
+            <img id="product-image" src="" alt="Product Image" style="max-width: 150px; height: auto;"/>
+            <p id="product-name"></p>
+            <p id="product-price"></p>
         </div>
-  </div>
-  <div class="mines-menu" id="minesMenu">
-      <label for="minesSelect">Select number of mines:</label>
-      <select id="minesSelect">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-      </select>
-
-
+    </div>
 </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-$(document).ready(function() {
-    const gridContainer = $('.grid-container');
-    const safeCellsCount = $('#safeCellsCount');
-    const minesCount = $('#minesCount');
-    const startButton = $('.start-button');
-    const betInput = $('#betInput'); // Assuming you have an input with ID betInput
-    const minesMenu = $('#minesMenu');
-    const multipliersContainer = $('.multipliers-container');
 
-    let isGameStarted = false;
-    let totalCells = 25; // Default totalCells value
-    let mineCount = 1; // Default number of mines
-    let mineIndices = [];
-    let currentMultiplierIndex = 0;
-    
-    const multipliers = [
-        1, 1.03, 1.12, 1.23, 1.35, 1.5, 1.66, 1.86, 2.09, 2.37,
-        2.71, 3.13, 3.65, 4.31, 5.18, 6.33, 7.91, 10.17, 13.57,
-        18.99, 28.49, 47.49, 94.99, 284.99
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize the map with default location
+            initMap();
+            $('#apply-filters').click(function() {
+        var locationFilter = $('#location-filter').val();
+        var typeFilter = $('#type-filter').val();
+        var maxPrice = parseFloat($('#price-filter').val()) || Infinity;
+
+        $('.product-item').each(function() {
+            var itemLocation = $(this).data('location');
+            var itemType = $(this).data('type');
+            var itemPrice = parseFloat($(this).data('price').replace('$', ''));
+
+            // Check if the item matches the filters
+            var matchesLocation = locationFilter === '' || itemLocation === locationFilter;
+            var matchesType = typeFilter === '' || itemType === typeFilter;
+            var matchesPrice = itemPrice <= maxPrice;
+
+            // Show or hide the item based on filter criteria
+            if (matchesLocation && matchesType && matchesPrice) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+            function generateRandomColor() {
+                return '#' + Math.floor(Math.random() * 16777215).toString(16);
+            }
+
+            function generateProductItems(numItems) {
+    const container = document.getElementById('product-grid');
+    const locations = [
+    'Ավան', 'Զեյթուն', 'Բանգլադեշ', '3-րդ Մաս', 'Կոմիտաս',
+        'Էրեբունի', 'Նորագավիթ', 'Շենգավիթ'
+    ];
+    const types = ['Indica', 'Sativa']; // Product types
+
+    const baseLat = 40.177200; // Center of Yerevan
+    const baseLng = 44.503490; // Center of Yerevan
+    const latOffset = 0.02; // Adjust offset to cover a larger area
+    const lngOffset = 0.02; // Adjust offset to cover a larger area
+
+    // Array of image URLs
+    const images = [
+        'https://thenaturalremedy.store/wp-content/uploads/2024/06/jkbhkkghygvh-600x600.png',
+        'https://thenaturalremedy.store/wp-content/uploads/2024/05/dosi-platinum-2-600x600.png',
+        'https://thenaturalremedy.store/wp-content/uploads/2024/05/Frankies-1-600x600.png',
+        'https://thenaturalremedy.store/wp-content/uploads/2020/12/new-weed-2-1-300x300.png',
+        'https://thenaturalremedy.store/wp-content/uploads/2020/09/cmass-removebg-e1657104210586.png'
     ];
 
-    function ensureDocumentIsScrollable() {
-        const isScrollable =
-          document.documentElement.scrollHeight > window.innerHeight;
-        if (!isScrollable) {
-          document.documentElement.style.setProperty(
-            "height",
-            "calc(100vh + 1px)",
-            "important"
-          );
-        }
-      }
-      function preventCollapse() {
-        if (window.scrollY === 0) {
-          window.scrollTo(0, 1);
-        }
-      }
+    for (let i = 0; i < numItems; i++) {
+        const lat = baseLat + (Math.random() - 0.5) * latOffset * 2; // Spread over a larger area
+        const lng = baseLng + (Math.random() - 0.5) * lngOffset * 2; // Spread over a larger area
+        const color = generateRandomColor();
+        const quantity = Math.floor(Math.random() * 100) + 1; // Random quantity for demonstration
+        const location = locations[Math.floor(Math.random() * locations.length)];
+        const type = types[Math.floor(Math.random() * types.length)];
+        
+        // Generate a random price between $25 and $45
+        const price = (Math.random() * (45 - 25) + 25).toFixed(2);
+        
+        // Choose a random image URL
+        const image = images[Math.floor(Math.random() * images.length)];
 
-      const scrollableElement = document.querySelector(".scrollable-element");
-      scrollableElement.addEventListener("touchstart", preventCollapse);
+        const productItem = document.createElement('div');
+        productItem.className = 'product-item';
+        productItem.setAttribute('data-name', `Product ${i + 1}`);
+        productItem.setAttribute('data-price', `$${price}`);
+        productItem.setAttribute('data-description', `Description for Product ${i + 1}`);
+        productItem.setAttribute('data-image', image);
+        productItem.setAttribute('data-lat', lat.toFixed(6));
+        productItem.setAttribute('data-lng', lng.toFixed(6));
+        productItem.setAttribute('data-color', color);
+        productItem.setAttribute('data-quantity', quantity);
+        productItem.setAttribute('data-location', location);
+        productItem.setAttribute('data-type', type);
 
-      window.addEventListener("load", ensureDocumentIsScrollable);
+        productItem.innerHTML = `
+            <div class="product-price">$${price}</div>
+            <img src="${image}" alt="Product ${i + 1} Image">
+            <div class="product-specific">
+                <div class="product-name">Աապրանք ${i + 1}</div>
+                <div class="product-location">${location}</div>
+                <div class="product-type">${type}</div>
+            </div>
+            <button class="buy-button">Գնել</button>
+        `;
 
-
-
-
-
-
-
-
-
-
-    function createGrid() {
-        gridContainer.empty(); // Clear the grid
-        updateInfoBox();
-        for (let i = 0; i < totalCells; i++) {
-            const cell = $('<div class="grid-item"><span></span></div>');
-            gridContainer.append(cell);
-        }
-        if (!isGameStarted) {
-            $('.grid-item').off('click'); // Remove any existing click listeners
-        }
+        container.appendChild(productItem);
     }
+}
 
-    function generateMineIndices() {
-        mineIndices = [];
-        while (mineIndices.length < mineCount) {
-            const newIndex = Math.floor(Math.random() * totalCells);
-            if (!mineIndices.includes(newIndex)) {
-                mineIndices.push(newIndex);
+generateProductItems(100);
+
+            $('.product-item').click(function() {
+                var name = $(this).data('name');
+                var price = $(this).data('price');
+                var description = $(this).data('description');
+                var image = $(this).data('image');
+                var lat = parseFloat($(this).data('lat'));
+                var lng = parseFloat($(this).data('lng'));
+
+                $('#product-name').text(name);
+                $('#product-price').text(price);
+                $('#product-description').text(description);
+                $('#product-image').attr('src', image);
+
+                // Optionally update the map location and add GeoJSON layer
+                initMap(lat, lng);
+
+                $('#overlay').fadeIn();
+                $('#product-details-menu').fadeIn();
+            });
+
+            $('#close-btn').click(function() {
+                $('#product-details-menu').hide();
+                $('#overlay').hide();
+            });
+
+            $('#overlay').click(function() {
+                $('#product-details-menu').fadeOut();
+                $('#overlay').fadeOut();
+            });
+
+            // Handle "Buy" button click
+            $(document).on('click', '.buy-button', function() {
+                var price = $(this).siblings('.product-price').text().replace('$', '');
+                var dashAddress = 'XdAUmwtig27HBG6WfYyHAzP8n6XC9jESEw';
+                var conversionRate = 0.05; // Example conversion rate from USD to DASH
+                var amountInDASH = parseFloat(price) * conversionRate;
+
+                // Get product details
+                var productImage = $(this).siblings('img').attr('src');
+                var productName = $(this).siblings('.product-specific').find('.product-name').text();
+                var productPrice = $(this).siblings('.product-price').text();
+
+                // Update modal with product details
+                $('#address').text(dashAddress);
+                $('#amount-value').text(amountInDASH.toFixed(2));
+                $('#product-image').attr('src', productImage);
+                $('#product-name').text(productName);
+                $('#product-price').text(productPrice);
+
+                // Show loading animation
+                $('#loading-animation').show();
+                $('#qr-code').hide();
+
+                // Generate QR Code for DASH address
+                var qr = qrcode(0, 'L');
+                qr.addData(dashAddress);
+                qr.make();
+                $('#qr-code').html(qr.createImgTag(4));
+
+                // Hide loading animation and show QR code
+                $('#loading-animation').hide();
+                $('#qr-code').show();
+
+                // Open the modal
+                $('#payment-modal').fadeIn();
+            });
+
+            // Close the modal
+            $('.close-btn').click(function() {
+                $('#payment-modal').fadeOut();
+            });
+
+            $('#payment-modal').click(function(event) {
+                if ($(event.target).is('#payment-modal')) {
+                    $('#payment-modal').fadeOut();
+                }
+            });
+
+        });
+
+        function initMap(lat = 40.177200, lng = 44.503490) {
+            mapboxgl.accessToken = 'pk.eyJ1IjoibnVibWFzdGVyNjY2IiwiYSI6ImNseXVpN2cxNDByMHUybHNnOHZpcGppMHcifQ.n8AzCR_WFx-YDwy7G6z7Hg';
+
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/dark-v11',
+                center: [lng, lat],
+                zoom: 15
+            });
+
+            map.on('load', function () {
+                var features = [];
+
+                $('.product-item').each(function() {
+                    var lat = parseFloat($(this).data('lat'));
+                    var lng = parseFloat($(this).data('lng'));
+                    var color = $(this).data('color');
+                    var quantity = $(this).data('quantity');
+
+                    // Define the range for random distances in meters
+                    const minDistanceMeters = 50;
+                    const maxDistanceMeters = 150;
+
+                    // Generate a random distance for each polygon
+                    const distanceMeters = getRandomDistance(minDistanceMeters, maxDistanceMeters);
+                    const radiusDegrees = distanceMeters * 0.00001;
+
+                    // Calculate polygon coordinates
+                    function generateCircleCoordinates(lng, lat, radius, points = 30) {
+                        const coordinates = [];
+                        for (let i = 0; i < points; i++) {
+                            const angle = (i / points) * 2 * Math.PI;
+                            const offsetLng = radius * Math.cos(angle);
+                            const offsetLat = radius * Math.sin(angle);
+                            coordinates.push([
+                                lng + offsetLng,
+                                lat + offsetLat
+                            ]);
+                        }
+                        coordinates.push(coordinates[0]); // Close the polygon
+                        return coordinates;
+                    }
+
+                    const coordinates = generateCircleCoordinates(lng, lat, radiusDegrees);
+
+                    features.push({
+                        "type": "Feature",
+                        "properties": {
+                            "title": $(this).data('name'),
+                            "color": color,
+                            "quantity": quantity
+                        },
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [coordinates]
+                        }
+                    });
+
+                    // Add a marker for each product
+                    new mapboxgl.Marker({ color: color })
+                        .setLngLat([lng, lat])
+                        .setPopup(new mapboxgl.Popup().setHTML(`
+                            <h3>${$(this).data('name')}</h3>
+                            <p>Price: ${$(this).data('price')}</p>
+                            <p>Description: ${$(this).data('description')}</p>
+                        `))
+                        .addTo(map);
+                });
+
+                var geojsonData = {
+                    "type": "FeatureCollection",
+                    "features": features
+                };
+
+                // Add GeoJSON data as a source on the map
+                map.addSource('products', {
+                    'type': 'geojson',
+                    'data': geojsonData
+                });
+
+                // Add the fill layer for circular outlines
+                map.addLayer({
+                    'id': 'products-outline',
+                    'type': 'fill',
+                    'source': 'products',
+                    'layout': {},
+                    'paint': {
+                        'fill-color': [
+                            'case',
+                            ['has', 'color'],
+                            ['get', 'color'],
+                            '#00f' // Default color if not specified
+                        ],
+                        'fill-opacity': 0.3,
+                        'fill-outline-color': '#000'
+                    }
+                });
+
+                // Add labels for quantities
+                map.addLayer({
+                    'id': 'products-labels',
+                    'type': 'symbol',
+                    'source': 'products',
+                    'layout': {
+                        'text-field': '{quantity}', // Display quantity
+                        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                        'text-size': 12
+                    },
+                    'paint': {
+                        'text-color': '#000000'
+                    }
+                });
+
+                // Add a click event listener to display popup
+                map.on('click', 'products-outline', (e) => {
+                    var coordinates = e.features[0].geometry.coordinates[0][0];
+                    var title = e.features[0].properties.title;
+                    var quantity = e.features[0].properties.quantity;
+
+                    new mapboxgl.Popup()
+                        .setLngLat(coordinates)
+                        .setHTML('<strong>' + title + '</strong><br>Quantity: ' + quantity)
+                        .addTo(map);
+                });
+            });
+
+            // Function to generate random distance within a range
+            function getRandomDistance(min, max) {
+                return Math.random() * (max - min) + min;
             }
         }
-    }
-
-    function placeMines() {
-        generateMineIndices();
-        $('.grid-item').each(function(index) {
-            if (mineIndices.includes(index)) {
-                $(this).data('isMine', true);
-                $(this).find('span').text('X').hide(); // Mark mine but hide it initially
-            } else {
-                $(this).data('isMine', false);
-            }
-        });
-    }
-
-    function handleCellClick(cell, index) {
-        if (!isGameStarted) return;
-
-        const isMine = cell.data('isMine');
-        if (isMine) {
-            cell.addClass('mine');
-            cell.find('span').css('visibility', 'visible');
-            setTimeout(() => {
-                alert('You hit a mine! Game restarts.');
-                startGame();
-                currentMultiplierIndex = 0; // Reset current multiplier index
-                updateMultiplierBoxes(); // Update multiplier boxes visually
-            }, 1000); // Adjust timing as needed
-        } else {
-            cell.addClass('safe');
-            cell.off('click'); // Remove click event for safe cell
-            currentMultiplierIndex++;
-            updateMultiplierBoxes();
-            checkWinCondition();
-        }
-    }
-
-    function checkWinCondition() {
-        const safeCellsOpened = $('.grid-item.safe').length;
-        if (safeCellsOpened === totalCells - mineCount) {
-            alert('Congratulations! You found all safe cells.');
-            startGame();
-        }
-    }
-
-    function updateInfoBox() {
-        safeCellsCount.text(totalCells - mineCount);
-        minesCount.text(mineCount);
-    }
-
-    function startGame() {
-        isGameStarted = true;
-        createGrid();
-        placeMines();
-        $('.grid-item').on('click', function() {
-            const index = $('.grid-item').index(this);
-            handleCellClick($(this), index);
-        });
-    }
-
-    function splitBet() {
-        let currentBet = parseFloat(betInput.val());
-        if (currentBet > 0.01) {
-            betInput.val((currentBet / 2).toFixed(2));
-        }
-    }
-
-    function doubleBet() {
-        let currentBet = parseFloat(betInput.val());
-        betInput.val((currentBet * 2).toFixed(2));
-    }
-
-    function toggleMinesMenu() {
-        // Toggle visibility of mines menu
-        minesMenu.toggleClass('active');
-
-        // Position the mines menu relative to the mine button
-        const buttonPosition = $('.popup-button').offset();
-        minesMenu.css({
-            bottom: $(window).height() - buttonPosition.top + 10,
-            right: $(window).width() - (buttonPosition.left + $('.popup-button').outerWidth())
-        });
-    }
-
-    function updateMineCount() {
-        mineCount = parseInt($('#minesSelect').val());
-        updateInfoBox();
-    }
-
-    function createMultiplierBoxes() {
-        multipliersContainer.empty();
-        multipliers.forEach((multiplier, index) => {
-            const box = $('<div class="multiplier-box"></div>');
-            if (index === currentMultiplierIndex) {
-                box.addClass('current');
-            }
-            box.text(multiplier.toFixed(2));
-            multipliersContainer.append(box);
-        });
-    }
-
-    function updateMultiplierBoxes() {
-        $('.multiplier-box').removeClass('current');
-        $('.multiplier-box').eq(currentMultiplierIndex).addClass('current');
-
-        // Get current multiplier box and its position
-        const currentBox = $('.multiplier-box.current');
-        const container = $('.multipliers-container');
-        const boxWidth = currentBox.outerWidth(); // Width of the current box
-        const scrollTo = currentBox.position().left + container.scrollLeft() - boxWidth / 1.5; // Adjusted scroll position
-
-        // Animate scroll to the adjusted position
-        container.animate({
-            scrollLeft: scrollTo
-        }, 600); // Adjust speed as needed
-    }
-
-    // Event Listeners
-    startButton.on('click', startGame);
-    $('#minesSelect').on('change', updateMineCount);
-
-    $('.button-container .button').on('click', function(event) {
-        const action = $(this).text().toLowerCase();
-        if (action === 'split') {
-            splitBet();
-        } else if (action === 'x2') {
-            doubleBet();
-        }
-    });
-
-    $('.popup-button').on('click', toggleMinesMenu);
-
-    // Prevent collapsing when scrolling on touch devices
-    $(document).on('touchmove', function(event) {
-        if (event.target.closest('.grid-container') || event.target.closest('.multipliers-container')) {
-            event.preventDefault();
-        }
-    });
-
-    // Initialize the game and multipliers
-    createGrid();
-    createMultiplierBoxes();
-});
-
     </script>
-
-
-</div>
 </body>
 </html>
