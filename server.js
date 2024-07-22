@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Serve static files (optional)
-app.use(express.static('public'));
+app.use(express.static('./'));
 
 // Route to handle form submissions
 // Ensure the products table exists
