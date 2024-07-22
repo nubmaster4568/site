@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Product Locations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Add styles for map container */
+        #map {
+            width: 100%;
+            height: 500px; /* Adjust as needed */
+        }
+
+        /* Style for payment modal */
+        #payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px; /* Adjust as needed */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-header, .modal-body, .modal-footer {
+            margin-bottom: 15px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        #loading-animation {
+            text-align: center;
+        }
+
+        #qr-code {
+            text-align: center;
+        }
+
+        #product-image {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">420</div>
+        <ul class="menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="#services">Services</a></li>
+        </ul>
+    </nav>
+
+    <div class="about-content2">
+        <div class="my-order-text">My Orders</div>
+        <div class="order-list">
+            <div class="order-item">Order #1: Product A - $30.00</div>
+            <div class="order-item">Order #2: Product B - $25.00</div>
+            <div class="order-item">Order #3: Product C - $45.00</div>
+            <!-- Add more orders as needed -->
+        </div>
+    </div>
+
+    <!-- Modal for payment details -->
+    <div id="payment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Payment Details</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="map" style="height: 300px;"></div> <!-- Adjust height as needed -->
+                <div id="loading-animation">Loading...</div>
+                <div id="qr-code"></div>
+                <div>
+                    <img id="product-image" src="" alt="Product Image">
+                    <div id="product-name"></div>
+                    <div id="product-price"></div>
+                    <div id="address"></div>
+                    <div id="amount-value"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        $(document).on('click', '.order-item', function() {
+            var price = $(this).text().split('$')[1];
+            var dashAddress = 'DASH_ADDRESS_EXAMPLE';
+            var conversionRate = 0.05; // Example conversion rate from USD to DASH
+            var amountInDASH = parseFloat(price) * conversionRate;
+
+            // Update modal with product details (assuming the modal has correct structure)
+            $('#address').text(dashAddress);
+            $('#amount-value').text(amountInDASH.toFixed(2));
+            $('#product-image').attr('src', 'product-image-url'); // Update with actual image URL
+            $('#product-name').text('Product Name'); // Update with actual product name
+            $('#product-price').text('$' + price);
+
+            // Show loading animation
+            $('#loading-animation').show();
+            $('#qr-code').hide();
+
+            // Generate QR Code for DASH address
+            var qr = qrcode(0, 'L');
+            qr.addData(dashAddress);
+            qr.make();
+            $('#qr-code').html(qr.createImgTag(4));
+
+            // Hide loading animation and show QR code
+            $('#loading-animation').hide();
+            $('#qr-code').show();
+
+            // Open the modal
+            $('#payment-modal').fadeIn();
+        });
+
+        // Close modal functionality
+        $(document).on('click', '.close, #close-modal', function() {
+            $('#payment-modal').fadeOut();
+        });
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibnVibWFzdGVyNjY2IiwiYSI6ImNseXVpN2cxNDByMHUybHNnOHZpcGppMHcifQ.n8AzCR_WFx-YDwy7G6z7Hg';
+
+        // Initialize Map
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v11', // Example of 3D night effect style
+            center: [44.5136, 40.1785], // Center on Yerevan
+            zoom: 14
+        });
+
+        // Add Navigation Control
+        map.addControl(new mapboxgl.NavigationControl());
+
+        // Fetch Route Data from Mapbox Directions API
+        fetch('https://api.mapbox.com/directions/v5/mapbox/cycling/44.5136,40.1785;44.5034,40.1770?access_token=' + mapboxgl.accessToken)
+            .then(response => response.json())
+            .then(data => {
+                const route = data.routes[0].geometry;
+                const routeGeoJSON = {
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: decodePolyline(route)
+                        }
+                    }]
+                };
+
+                // Add Route to Map
+                map.addSource('route', {
+                    'type': 'geojson',
+                    'data': routeGeoJSON
+                });
+
+                map.addLayer({
+                    'id': 'route',
+                    'type': 'line',
+                    'source': 'route',
+                    'layout': {
+                        'line-cap': 'round',
+                        'line-join': 'round'
+                    },
+                    'paint': {
+                        'line-color': '#ff5500',
+                        'line-width': 8
+                    }
+                });
+
+                // Add Markers for Start and End Points
+                const pointA = [44.5136, 40.1785]; // Starting point
+                const pointB = [44.5034, 40.1770]; // Ending point
+
+                new mapboxgl.Marker({ color: 'blue' })
+                    .setLngLat(pointA)
+                    .setPopup(new mapboxgl.Popup().setText('Start Point'))
+                    .addTo(map);
+
+                new mapboxgl.Marker({ color: 'red' })
+                    .setLngLat(pointB)
+                    .setPopup(new mapboxgl.Popup().setText('End Point'))
+                    .addTo(map);
+
+                // Adjust the map view to fit the route and points
+                const bounds = new mapboxgl.LngLatBounds();
+                routeGeoJSON.features[0].geometry.coordinates.forEach(coord => bounds.extend(coord));
+                bounds.extend(pointA);
+                bounds.extend(pointB);
+                map.fitBounds(bounds, { padding: 20 });
+            });
+
+        // Function to Decode Polyline
+        function decodePolyline(encoded) {
+            let len = encoded.length;
+            let index = 0;
+            let lat = 0;
+            let lng = 0;
+            let array = [];
+            let shift = 0;
+            let result = 0;
+            let byte = null;
+            let latitude_change;
+            let longitude_change;
+
+            while (index < len) {
+                shift = 0;
+                result = 0;
+                do {
+                    byte = encoded.charCodeAt(index++) - 63;
+                    result |= (byte & 0x1f) << shift;
+                    shift += 5;
+                } while (byte >= 0x20);
+                latitude_change = (result & 1) ? ~(result >> 1) : (result >> 1);
+                shift = 0;
+                result = 0;
+                do {
+                    byte = encoded.charCodeAt(index++) - 63;
+                    result |= (byte & 0x1f) << shift;
+                    shift += 5;
+                } while (byte >= 0x20);
+                longitude_change = (result & 1) ? ~(result >> 1) : (result >> 1);
+                lat += latitude_change;
+                lng += longitude_change;
+                array.push([lng * 1e-5, lat * 1e-5]);
+            }
+
+            return array;
+        }
+    </script>
+</body>
+</html>
