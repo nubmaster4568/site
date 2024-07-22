@@ -83,12 +83,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-    <script>
+        <script>
         $(document).ready(function() {
-            let map
-            initMap()
+            var map; // Define map variable at a higher scope
+
+            
+
             function initMap(lat = 40.177200, lng = 44.503490) {
-// Initialize the map only if it's not already initialized
+                if (!map) { // Initialize the map only if it's not already initialized
                     mapboxgl.accessToken = 'pk.eyJ1IjoibnVibWFzdGVyNjY2IiwiYSI6ImNseXVpN2cxNDByMHUybHNnOHZpcGppMHcifQ.n8AzCR_WFx-YDwy7G6z7Hg';
                     map = new mapboxgl.Map({
                         container: 'map',
@@ -205,14 +207,21 @@
                     function getRandomDistance(min, max) {
                         return Math.random() * (max - min) + min;
                     }
-                
+                } else {
+                    // Update the center if map already initialized
+                    map.setCenter([lng, lat]);
+                    map.setZoom(15); // Optionally set zoom level
+                }
             }
-    
-            // Initialize map on page load
-            initMap();
+                // Fetch and display products on page load
+                fetchAndDisplayProducts().then(() => {
+    setTimeout(() => {
+        // Initialize map on page load
+        initMap();
+    }, 2000); // Timeout delay in milliseconds (2000 ms = 2 seconds)
+});
     
             // Fetch and display products on page load
-            fetchAndDisplayProducts();
     
             // Filter products
             $('#apply-filters').click(function() {
@@ -239,7 +248,7 @@
                 });
             });
     
-            function fetchAndDisplayProducts() {
+            async function fetchAndDisplayProducts() {
                 $.ajax({
                     url: 'https://site-45i5.onrender.com/api/products', // Endpoint to fetch products
                     method: 'GET',
@@ -259,7 +268,7 @@
                                 .attr('data-image', product.product_image) // Added
                                 .attr('data-location', product.location) // Added
                                 .html(`
-                                    <div class="product-price">$${product.price.toFixed(2)}</div>
+                                    <div class="product-price">$${product.price.toFixed(2)} ${product.weight}g </div>
                                     <img src="${product.product_image}" alt="${product.name} Image">
                                     <div class="product-specific">
                                         <div class="product-name">${product.name}</div>
