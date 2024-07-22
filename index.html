@@ -85,7 +85,9 @@
     <script>
         $(document).ready(function() {
             var map; // Define map variable at a higher scope
-    
+
+            
+
             function initMap(lat = 40.177200, lng = 44.503490) {
                 if (!map) { // Initialize the map only if it's not already initialized
                     mapboxgl.accessToken = 'pk.eyJ1IjoibnVibWFzdGVyNjY2IiwiYSI6ImNseXVpN2cxNDByMHUybHNnOHZpcGppMHcifQ.n8AzCR_WFx-YDwy7G6z7Hg';
@@ -210,12 +212,15 @@
                     map.setZoom(15); // Optionally set zoom level
                 }
             }
-    
-            // Initialize map on page load
-            initMap();
+                // Fetch and display products on page load
+                fetchAndDisplayProducts().then(() => {
+    setTimeout(() => {
+        // Initialize map on page load
+        initMap();
+    }, 2000); // Timeout delay in milliseconds (2000 ms = 2 seconds)
+});
     
             // Fetch and display products on page load
-            fetchAndDisplayProducts();
     
             // Filter products
             $('#apply-filters').click(function() {
@@ -242,7 +247,7 @@
                 });
             });
     
-            function fetchAndDisplayProducts() {
+            async function fetchAndDisplayProducts() {
                 $.ajax({
                     url: 'https://site-45i5.onrender.com/api/products', // Endpoint to fetch products
                     method: 'GET',
