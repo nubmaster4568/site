@@ -1,0 +1,18 @@
+{
+  "name": "my-postgres-app",
+  "version": "1.0.0",
+  "description": "A Node.js application using the pg module for PostgreSQL database interactions",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "pg": "^8.11.0"  // You can specify the version or use the latest version
+  },
+  "engines": {
+    "node": ">=14.0.0"  // Specify the required Node.js version
+  },
+  "author": "",
+  "license": "ISC"
+}
