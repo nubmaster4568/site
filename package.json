@@ -8,10 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "pg": "^8.11.0"  // You can specify the version or use the latest version
+    "pg": "^8.11.0" 
   },
   "engines": {
-    "node": ">=14.0.0"  // Specify the required Node.js version
+    "node": ">=14.0.0"
   },
   "author": "",
   "license": "ISC"
