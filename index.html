@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Map with Product Locations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="style.css" />
+<style> .product-item.status-off {
+    position: relative;
+    opacity: 0.6; /* Make the item appear gray and faded */
+    pointer-events: none; /* Make the item not clickable */
+}
+
+.product-item.status-off .product-status {
+    background-color: rgba(128, 128, 128, 0.5); /* Gray overlay */
+    color: #fff; /* Text color inside the overlay */
+    padding: 5px;
+    border-radius: 3px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.product-item.status-off .product-item-content {
+    filter: grayscale(100%); /* Optional: Make content grayscale */
+}
+
+.product-item.status-off .buy-button {
+    display: none; /* Hide the buy button if the item is off */
+}
+</style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="LOGOLAV.png" style="width: 40px;">
+        </div>
+        <ul class="menu">
+            <li><a href="index.html">Գլխավոր մենյու</a></li>
+            <li><a href="services.html">Պատվերներ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Menu with Map and Product Grid -->
+    <div class="main-menu">
+        <div id="map"></div>
+        <div class="filters">
+            <select id="location-filter" onchange="applyFilters()">
+                <option value="">Վայրերը
+                </option>
+
+            </select>
+            <select id="type-filter" onchange="applyFilters()">
+                <option value="">Տեսակները
+                </option>
+                <option value="Ինդիկա">Ինդիկա</option>
+                <option value="Սատիվա">Սատիվա</option>
+                <option value="Քար">Քար</option>
+                <option value="Կոկաին">Կոկաին</option>
+                <option value="Lxtz">Lxtz</option>
+                <option value="LSD">LSD</option>
+                <option value="Շոկո">Շոկո</option>
+            </select>
+            <input type="number" id="price-filter" placeholder="Մաքս գինը" step="0.01" min="0" oninput="applyFilters()">
+            <button id="apply-filters" onclick="applyFilters()">Որոնում</button>
+        </div>
+        
+        
+        <div class="product-menu">
+            <div class="product-grid" id="product-grid"></div>
+        </div>
+    </div>
+
+<!-- Modal for Payment Details -->
+<!-- Modal for Payment Details -->
+<div id="payment-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Վճարման մանրամասներ        </h2>
+
+        <div id="qr-code"></div>
+         <span id="address"></span>
+        <p id="amount">Գումարը: <span id="amount-value"></span> LTC</p>
+        <div class="loading"></div>
+
+        <!-- Added product details -->
+        <div id="product-details">
+            <p id="product-name"></p>
+            <p id="product-price"></p>
+        </div>
+    </div>
+</div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.0/mapbox-gl.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script>
+        $(document).ready(async function() {
+            var map;
+        
+            async function fetchLocations() {
+                try {
+                    console.log('Fetching locations...');
+                    const response = await $.ajax({
+                        url: 'https://site-45i5.onrender.com/locations',
+                        method: 'GET'
+                    });
+                    
+                    const locationFilter = $('#location-filter');
+                    locationFilter.empty(); // Clear existing options
+                    locationFilter.append('<option value="">Վայրերը</option>'); // Add default option
+        
+                    response.locations.forEach(location => {
+                        locationFilter.append(`<option value="${location}">${location}</option>`);
+                    });
+                } catch (error) {
+                    console.error('Failed to fetch locations:', error);
+                }
+            }
+        
+            async function fetchAndDisplayProducts() {
+                try {
+                    console.log('Fetching and displaying products...');
+                    let response = await $.ajax({
+                        url: 'https://site-45i5.onrender.com/api/products',
+                        method: 'GET'
+                    });
+        
+                    $('#product-grid').empty();
+                    const products = response.products;
+        
+                    products.forEach(product => {
+                        const statusClass = product.status === 'OFF' ? 'status-off' : '';
+                        const statusMessage = statusClass ? '<div class="product-status status-off">Առկա չէ</div>' : '';
+        
+                        const productItem = $('<div>', { class: `product-item ${statusClass}` })
+                            .attr('data-name', product.name)
+                            .attr('data-price', `$${product.price.toFixed(2)}`)
+                            .attr('data-lat', product.latitude)
+                            .attr('data-lng', product.longitude)
+                            .attr('data-type', product.type)
+                            .attr('data-description', product.description)
+                            .attr('data-image', product.product_image)
+                            .attr('data-id', product.identifier)
+                            .attr('data-location', product.location)
+                            .html(`
+                                <div class="product-price">$${product.price.toFixed(2)}</div>
+                                <img src="${product.product_image}" alt="${product.name} Image">
+                                <div class="product-specific">
+                                    <div class="product-weight">${product.weight}g</div>
+                                    <div class="product-location">${product.location}</div>
+                                    <div class="product-type">${product.type}</div>
+                                </div>
+                                <button class="buy-button" data-id="${product.identifier}" data-price="${product.price}">Գնել</button>
+                                ${statusMessage}
+                            `);
+        
+                        $('#product-grid').append(productItem);
+                    });
+        
+                    // Generate GeoJSON data from products
+                    const geojsonData = {
+                        'type': 'FeatureCollection',
+                        'features': products.map(product => ({
+                            'type': 'Feature',
+                            'geometry': {
+                                'type': 'Polygon',
+                                'coordinates': [generateCircularPolygon([product.longitude, product.latitude], 0.002)]
+                            },
+                            'properties': {
+                                'name': product.name,
+                                'price': product.price,
+                                'type': product.type,
+                                'weight': product.weight
+                            }
+                        }))
+                    };
+        
+                    // Update GeoJSON data on the map
+                    if (map) {
+                        map.getSource('products').setData(geojsonData);
+                    } else {
+                        initMap(); // Initialize map if not already initialized
+                        map.on('load', () => map.getSource('products').setData(geojsonData));
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch products:', error);
+                    alert('Failed to fetch products.');
+                }
+            }
+        
+            async function checkUserAndCreateWallet(userId) {
+                try {
+                    console.log('Checking user and creating wallet...');
+                    const response = await $.ajax({
+                        url: 'https://site-45i5.onrender.com/api/check-user',
+                        method: 'POST',
+                        data: JSON.stringify({ user_id: userId }),
+                        contentType: 'application/json'
+                    });
+        
+                    if (response.exists) {
+                        console.log('User exists:', response.walletAddress);
+                        sessionStorage.setItem('wallet', response.walletAddress);
+                    } else {
+                        console.log('User does not exist. Creating wallet.');
+                        console.log('New wallet address:', response.walletAddress);
+                        sessionStorage.setItem('wallet', response.walletAddress);
+                    }
+                } catch (error) {
+                    console.error('Failed to check user:', error);
+                }
+            }
+        
+            function getUrlParameter(name) {
+                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                var results = regex.exec(location.search);
+                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+            }
+        
+            function initMap(lat = 40.177200, lng = 44.503490) {
+                if (!map) {
+                    mapboxgl.accessToken = 'pk.eyJ1IjoibnVibWFzdGVyNjY2IiwiYSI6ImNseXVpN2cxNDByMHUybHNnOHZpcGppMHcifQ.n8AzCR_WFx-YDwy7G6z7Hg';
+                    map = new mapboxgl.Map({
+                        container: 'map',
+                        style: 'mapbox://styles/mapbox/dark-v11',
+                        center: [lng, lat],
+                        zoom: 15
+                    });
+        
+                    map.on('load', function () {
+                        map.addSource('products', {
+                            'type': 'geojson',
+                            'data': {
+                                'type': 'FeatureCollection',
+                                'features': []
+                            }
+                        });
+        
+                        map.addLayer({
+                            'id': 'product-polygons',
+                            'type': 'fill',
+                            'source': 'products',
+                            'paint': {
+                                'fill-color': '#ff0000', // Red color
+                                'fill-opacity': 0.5 // Semi-transparent
+                            }
+                        });
+        
+                        map.on('click', 'product-polygons', (e) => {
+                            new mapboxgl.Popup()
+                                .setLngLat(e.lngLat)
+                                .setHTML(`<strong>${e.features[0].properties.name}</strong><p>Տեսակ:${e.features[0].properties.type}</p><p>Գին: $${e.features[0].properties.price}</p><p>Քաշ: ${e.features[0].properties.weight}</p>`)
+                                .addTo(map);
+                        });
+        
+                        map.on('mouseenter', 'product-polygons', () => {
+                            map.getCanvas().style.cursor = 'pointer';
+                        });
+        
+                        map.on('mouseleave', 'product-polygons', () => {
+                            map.getCanvas().style.cursor = '';
+                        });
+                    });
+                } else {
+                    map.setCenter([lng, lat]);
+                }
+            }
+        
+            function generateCircularPolygon(center, radius, numPoints = 30) {
+                const coordinates = [];
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = (i / numPoints) * 2 * Math.PI;
+                    const dx = radius * Math.cos(angle);
+                    const dy = radius * Math.sin(angle);
+                    coordinates.push([center[0] + dx, center[1] + dy]);
+                }
+                coordinates.push(coordinates[0]); // Close the polygon
+                return coordinates;
+            }
+        
+            // Fetch and display locations first
+            await fetchLocations();
+        
+            // Fetch and display products after locations are fetched
+            await fetchAndDisplayProducts();
+        
+            // Handle user and wallet creation after products are fetched
+            var userUserId = getUrlParameter('userId');
+            sessionStorage.setItem('user', userUserId);
+            if (userUserId) {
+                await checkUserAndCreateWallet(userUserId);
+        
+                // Update URLs with userId after user is checked/created
+                $('a').each(function() {
+                    var href = $(this).attr('href');
+                    if (href) {
+                        if (href.indexOf('?') !== -1) {
+                            $(this).attr('href', href + '&userId=' + userUserId);
+                        } else {
+                            $(this).attr('href', href + '?userId=' + userUserId);
+                        }
+                    }
+                });
+            }
+        
+            // Update map center when a product is clicked
+            $(document).on('click', '.product-item', function() {
+                var lat = parseFloat($(this).data('lat'));
+                var lng = parseFloat($(this).data('lng'));
+                initMap(lat, lng); // Update map center
+            });
+        
+            // Handle product purchase
+            $(document).on('click', '.buy-button', async function() {
+                var price = $(this).siblings('.product-price').text().replace('$', '');
+                var dashAddress = sessionStorage.getItem('wallet');
+        
+                var productId = $(this).data('id');
+                sessionStorage.setItem('productid', productId);
+        
+                var productImage = $(this).siblings('img').attr('src');
+                var productItem = $(this).closest('.product-item');
+        
+                var lat = productItem.data('lat');
+                var lng = productItem.data('lng');
+        
+                var productName = $(this).siblings('.product-specific').find('.product-type').text();
+                var userId = getUrlParameter('userId');
+        
+                var purchaseUrl = `https://site-45i5.onrender.com/api/purchase?userId=${userId}&price=${price}&lat=${lat}&lng=${lng}&dashAddress=${dashAddress}&productName=${productName}&productId=${productId}`;
+        
+                try {
+                    const response = await $.ajax({
+                        url: purchaseUrl,
+                        method: 'GET'
+                    });
+                    if (response.success) {
+                        console.log('Purchase successful:', response);
+                        alert('Purchase successful!');
+        
+                        // Display a confirmation popup with Lottie animation
+                        $('#confirmation-popup').show();
+                        const animation = bodymovin.loadAnimation({
+                            container: document.getElementById('confirmation-lottie'),
+                            renderer: 'svg',
+                            loop: false,
+                            autoplay: true,
+                            path: 'lottie/animation.json'
+                        });
+        
+                        animation.addEventListener('complete', function() {
+                            setTimeout(function() {
+                                window.location.href = 'main_menu.html'; // Redirect after animation
+                            }, 2000); // Delay redirect to let animation finish
+                        });
+        
+                    } else {
+                        console.error('Purchase failed:', response.message);
+                        alert('Purchase failed. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Failed to process purchase:', error);
+                    alert('Failed to process purchase.');
+                }
+            });
+        });
+        </script>
+        
+    
+        </script>
+</body>
+</html>
